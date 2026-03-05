@@ -1,12 +1,12 @@
 /**
- * @file ui_hello_world_gen.c
+ * @file ui_envhub_gen.c
  */
 
 /*********************
  *      INCLUDES
  *********************/
 
-#include "ui_hello_world_gen.h"
+#include "ui_envhub_gen.h"
 
 #if LV_USE_XML
 #endif /* LV_USE_XML */
@@ -63,7 +63,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void ui_hello_world_init_gen(const char * asset_path)
+void ui_envhub_init_gen(const char * asset_path)
 {
     char buf[256];
 

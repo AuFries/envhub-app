@@ -1,9 +1,9 @@
 /**
- * @file screen_hello_world_gen.h
+ * @file screen_secondary_gen.h
  */
 
-#ifndef SCREEN_HELLO_WORLD_H
-#define SCREEN_HELLO_WORLD_H
+#ifndef SCREEN_SECONDARY_H
+#define SCREEN_SECONDARY_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,7 +33,7 @@ extern "C" {
 
 
 
-lv_obj_t * screen_hello_world_create(void);
+lv_obj_t * screen_secondary_create(void);
 
 /**********************
  *      MACROS
@@ -43,4 +43,4 @@ lv_obj_t * screen_hello_world_create(void);
 } /*extern "C"*/
 #endif
 
-#endif /*SCREEN_HELLO_WORLD_H*/
+#endif /*SCREEN_SECONDARY_H*/

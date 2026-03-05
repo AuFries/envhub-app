@@ -1,9 +1,9 @@
 /**
- * @file ui_hello_world.h
+ * @file ui_envhub.h
  */
 
-#ifndef UI_HELLO_WORLD_H
-#define UI_HELLO_WORLD_H
+#ifndef UI_ENVHUB_H
+#define UI_ENVHUB_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,8 +12,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-
-#include "ui_hello_world_gen.h"
+#include "fonts/fonts.h"
+#include "ui_envhub_gen.h"
 
 /*********************
  *      DEFINES
@@ -34,7 +34,7 @@ extern "C" {
 /**
  * Initialize the component library
  */
-void ui_hello_world_init(const char * asset_path);
+void ui_envhub_init(const char * asset_path);
 
 /**********************
  *      MACROS
@@ -44,4 +44,4 @@ void ui_hello_world_init(const char * asset_path);
 } /*extern "C"*/
 #endif
 
-#endif /*UI_HELLO_WORLD_H*/
+#endif /*UI_ENVHUB_H*/

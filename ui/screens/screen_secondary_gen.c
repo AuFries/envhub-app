@@ -1,5 +1,5 @@
 /**
- * @file screen_hello_world_gen.c
+ * @file screen_secondary_gen.c
  * @brief Template source file for LVGL objects
  */
 
@@ -7,8 +7,8 @@
  *      INCLUDES
  *********************/
 
-#include "screen_hello_world_gen.h"
-#include "ui_hello_world.h"
+#include "screen_secondary_gen.h"
+#include "ui_envhub.h"
 
 /*********************
  *      DEFINES
@@ -30,7 +30,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * screen_hello_world_create(void)
+lv_obj_t * screen_secondary_create(void)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
@@ -46,7 +46,7 @@ lv_obj_t * screen_hello_world_create(void)
     }
 
     lv_obj_t * lv_obj_0 = lv_obj_create(NULL);
-    lv_obj_set_name_static(lv_obj_0, "screen_hello_world_#");
+    lv_obj_set_name_static(lv_obj_0, "screen_secondary_#");
 
     lv_obj_add_style(lv_obj_0, &style_main, 0);
     lv_obj_t * lv_button_0 = lv_button_create(lv_obj_0);
@@ -54,7 +54,6 @@ lv_obj_t * screen_hello_world_create(void)
     lv_obj_set_style_bg_color(lv_button_0, lv_color_hex3(0x111), 0);
     lv_obj_t * lv_label_0 = lv_label_create(lv_button_0);
     lv_label_set_text(lv_label_0, "Hello world");
-    lv_obj_set_style_text_font(lv_label_0, font_medium, 0);
 
     LV_TRACE_OBJ_CREATE("finished");
 

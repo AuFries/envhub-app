@@ -1,9 +1,9 @@
 /**
- * @file ui_hello_world_gen.h
+ * @file ui_envhub_gen.h
  */
 
-#ifndef UI_HELLO_WORLD_GEN_H
-#define UI_HELLO_WORLD_GEN_H
+#ifndef UI_ENVHUB_GEN_H
+#define UI_ENVHUB_GEN_H
 
 #ifndef UI_SUBJECT_STRING_LENGTH
 #define UI_SUBJECT_STRING_LENGTH 256
@@ -67,7 +67,7 @@ extern "C" {
  * Initialize the component library
  */
 
-void ui_hello_world_init_gen(const char * asset_path);
+void ui_envhub_init_gen(const char * asset_path);
 
 /**********************
  *      MACROS
@@ -78,10 +78,11 @@ void ui_hello_world_init_gen(const char * asset_path);
  **********************/
 
 /*Include all the widget and components of this library*/
-#include "screens/screen_hello_world_gen.h"
+#include "screens/screen_main_gen.h"
+#include "screens/screen_secondary_gen.h"
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*UI_HELLO_WORLD_GEN_H*/
+#endif /*UI_ENVHUB_GEN_H*/
