@@ -2,48 +2,56 @@
  * @file ui_envhub.c
  */
 #include "ui_envhub.h"
-#include "lvgl.h"
+#include <lvgl/lvgl.h>
 #include <string.h>
 
-static lv_obj_t * time_label = NULL;
+static lv_obj_t *time_label = NULL;
 
-static lv_obj_t * find_by_name_dfs(lv_obj_t * root, const char * target)
+static lv_obj_t *find_by_name_dfs(lv_obj_t *root, const char *target)
 {
-    if(!root) return NULL;
+    if (!root)
+        return NULL;
 
-    const char * n = lv_obj_get_name(root);   /* LVGL 9 */
-    if(n && strcmp(n, target) == 0) return root;
+    const char *n = lv_obj_get_name(root); /* LVGL 9 */
+    if (n && strcmp(n, target) == 0)
+        return root;
 
     uint32_t cnt = lv_obj_get_child_cnt(root);
-    for(uint32_t i = 0; i < cnt; i++) {
-        lv_obj_t * hit = find_by_name_dfs(lv_obj_get_child(root, i), target);
-        if(hit) return hit;
+    for (uint32_t i = 0; i < cnt; i++)
+    {
+        lv_obj_t *hit = find_by_name_dfs(lv_obj_get_child(root, i), target);
+        if (hit)
+            return hit;
     }
     return NULL;
 }
 
-static lv_obj_t * find_tiles_wrap_anywhere(void)
+static lv_obj_t *find_tiles_wrap_anywhere(void)
 {
-    lv_display_t * d = lv_display_get_default();
-    if(!d) return NULL;
+    lv_display_t *d = lv_display_get_default();
+    if (!d)
+        return NULL;
 
-    lv_obj_t * roots[] = {
+    lv_obj_t *roots[] = {
         lv_display_get_screen_active(d),
         lv_display_get_layer_top(d),
         lv_display_get_layer_sys(d),
         lv_display_get_layer_bottom(d),
     };
 
-    for(size_t i = 0; i < sizeof(roots)/sizeof(roots[0]); i++) {
-        lv_obj_t * hit = find_by_name_dfs(roots[i], "ui_tiles_wrap");
-        if(hit) return hit;
+    for (size_t i = 0; i < sizeof(roots) / sizeof(roots[0]); i++)
+    {
+        lv_obj_t *hit = find_by_name_dfs(roots[i], "ui_tiles_wrap");
+        if (hit)
+            return hit;
     }
     return NULL;
 }
 
-static void apply_tiles_grid(lv_obj_t * wrap)
+static void apply_tiles_grid(lv_obj_t *wrap)
 {
-    if(!wrap) return;
+    if (!wrap)
+        return;
 
     lv_obj_clear_flag(wrap, LV_OBJ_FLAG_SCROLLABLE);
 
@@ -63,10 +71,12 @@ static void apply_tiles_grid(lv_obj_t * wrap)
     lv_obj_clear_flag(wrap, LV_OBJ_FLAG_SCROLLABLE);
 
     uint32_t n = lv_obj_get_child_cnt(wrap);
-    if(n < 6) return;
+    if (n < 6)
+        return;
 
-    for(uint32_t i = 0; i < 6; i++) {
-        lv_obj_t * tile = lv_obj_get_child(wrap, i);
+    for (uint32_t i = 0; i < 6; i++)
+    {
+        lv_obj_t *tile = lv_obj_get_child(wrap, i);
         uint32_t col = i % 2;
         uint32_t row = i / 2;
 
@@ -78,30 +88,32 @@ static void apply_tiles_grid(lv_obj_t * wrap)
     lv_obj_update_layout(wrap);
 }
 
-static void remove_scrollbars(lv_obj_t * scr)
+static void remove_scrollbars(lv_obj_t *scr)
 {
     lv_obj_set_scrollbar_mode(scr, LV_SCROLLBAR_MODE_OFF);
-    for(uint32_t i = 0; i < lv_obj_get_child_cnt(scr); i++) {
-        lv_obj_t * tile = lv_obj_get_child(scr, i);
+    for (uint32_t i = 0; i < lv_obj_get_child_cnt(scr); i++)
+    {
+        lv_obj_t *tile = lv_obj_get_child(scr, i);
         lv_obj_clear_flag(tile, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_set_scrollbar_mode(tile, LV_SCROLLBAR_MODE_OFF);
     }
 }
 
-static void apply_grid_cb(lv_timer_t * t)
+static void apply_grid_cb(lv_timer_t *t)
 {
-    lv_obj_t * wrap = find_tiles_wrap_anywhere();
-    if(wrap) {
+    lv_obj_t *wrap = find_tiles_wrap_anywhere();
+    if (wrap)
+    {
         remove_scrollbars(wrap);
         apply_tiles_grid(wrap);
         lv_timer_del(t); /* done */
     }
 }
 
-void ui_envhub_init(const char * asset_path)
+void ui_envhub_init(void)
 {
     lv_xml_register_font(NULL, "plex_sans_12", plex_sans_12);
-    ui_envhub_init_gen(asset_path);
+    ui_envhub_init_gen(NULL);
 
     time_label = find_by_name_dfs(lv_display_get_screen_active(lv_display_get_default()), "time");
 
@@ -113,16 +125,9 @@ void ui_envhub_init(const char * asset_path)
     lv_timer_create(apply_grid_cb, 1, NULL);
 }
 
-static void set_time_cb(void *p)
+void ui_envhub_set_time_text(const char *s)
 {
-    const char *s = (const char *)p;
-    ui_envhub_set_time_text(s);
-    lv_free(p);
-}
-
-void ui_envhub_set_time_text_async(const char *s)
-{
-    if (!s) return;
-    char *copy = lv_strdup(s);
-    lv_async_call(set_time_cb, copy);
+    if(time_label && s) {
+        lv_label_set_text(time_label, s);
+    }
 }

@@ -1,7 +1,20 @@
+#include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <errno.h>
+#include <string.h>
+#include <stdlib.h>
+#include <inttypes.h>
+
 #include <lvgl/lvgl.h>
 #include <lvgl/src/drivers/display/drm/lv_linux_drm.h>
+
 #include "services/time_service.h"
 #include "ui/ui_envhub.h"
+
+static volatile bool g_run = true;
 
 static void *tick_thread(void *arg)
 {
@@ -22,74 +35,52 @@ static int64_t parse_i64(const char *s, int64_t def)
     return (int64_t)v;
 }
 
-static void lvgl_drm_init(void)
+static int lvgl_drm_init(int argc, char **argv)
 {
     const char *card = "/dev/dri/card0";
-    int64_t connector_id = -1; /* -1 = auto-select a connected connector */
+    int64_t connector_id = -1;
 
     if(argc >= 2) card = argv[1];
     if(argc >= 3) connector_id = parse_i64(argv[2], -1);
 
-    printf("[envhub-app] starting\n");
-    printf("[envhub-app] card=%s connector_id=%" PRId64 "\n", card, connector_id);
-    printf("[envhub-app] LV_RESULT_OK=%d LV_RESULT_INVALID=%d\n",
-            (int)LV_RESULT_OK, (int)LV_RESULT_INVALID);
-
     lv_init();
-    printf("[envhub-app] lv_init() ok\n");
 
     lv_display_t *disp = lv_linux_drm_create();
     if(!disp) {
-        fprintf(stderr, "[envhub-app] ERROR: lv_linux_drm_create() returned NULL\n");
-        return 1;
+        fprintf(stderr, "ERROR: lv_linux_drm_create() returned NULL\n");
+        return -1;
     }
-    printf("[envhub-app] lv_linux_drm_create() ok: disp=%p\n", (void*)disp);
 
     lv_result_t r = lv_linux_drm_set_file(disp, card, connector_id);
-    printf("[envhub-app] lv_linux_drm_set_file(%s, %" PRId64 ") => %d\n",
-           card, connector_id, (int)r);
-
     if(r != LV_RESULT_OK) {
-        fprintf(stderr, "[envhub-app] ERROR: lv_linux_drm_set_file failed\n");
-        fprintf(stderr, "[envhub-app] Hint: verify /dev/dri/cardX exists and you have atomic+dumb buffers\n");
-        return 1;
+        fprintf(stderr, "ERROR: lv_linux_drm_set_file failed\n");
+        return -1;
     }
 
     lv_display_set_default(disp);
-    printf("[envhub-app] default display set\n");
-
-    int32_t hor = lv_display_get_horizontal_resolution(disp);
-    int32_t ver = lv_display_get_vertical_resolution(disp);
-    lv_color_format_t cf = lv_display_get_color_format(disp);
-
-    printf("[envhub-app] detected resolution: %" LV_PRId32 " x %" LV_PRId32 "\n", hor, ver);
-    printf("[envhub-app] color format enum: %d\n", (int)cf);
 
     pthread_t th;
     if(pthread_create(&th, NULL, tick_thread, NULL) != 0) {
-        fprintf(stderr, "[envhub-app] ERROR: pthread_create failed: %s\n", strerror(errno));
-        return 1;
+        fprintf(stderr, "ERROR: pthread_create failed: %s\n", strerror(errno));
+        return -1;
     }
-    printf("[envhub-app] tick thread started\n");
-}
-
-int main(int argc, char **argv)
-{
-    time_service_init();
-    lvgl_drm_init();
-    ui_envhub_init();
 
     return 0;
 }
 
-// sets up logging
+int main(int argc, char **argv)
+{
+    if(lvgl_drm_init(argc, argv) != 0) {
+        return 1;
+    }
 
-// initializes LVGL + input drivers
+    ui_envhub_init();
+    time_service_start();
 
-// initializes services
+    while(g_run) {
+        lv_timer_handler();
+        usleep(5000);
+    }
 
-// creates threads/tasks
-
-// starts the main loops
-
-// defines shutdown order
+    return 0;
+}

@@ -30,12 +30,12 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void ui_envhub_set_time_text_async(const char *s);
+void ui_envhub_set_time_text(const char *s);
 
 /**
  * Initialize the component library
  */
-void ui_envhub_init(const char * asset_path);
+void ui_envhub_init(void);
 
 /**********************
  *      MACROS
