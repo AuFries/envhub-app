@@ -5,6 +5,8 @@
 #include "lvgl.h"
 #include <string.h>
 
+static lv_obj_t * time_label = NULL;
+
 static lv_obj_t * find_by_name_dfs(lv_obj_t * root, const char * target)
 {
     if(!root) return NULL;
@@ -43,6 +45,8 @@ static void apply_tiles_grid(lv_obj_t * wrap)
 {
     if(!wrap) return;
 
+    lv_obj_clear_flag(wrap, LV_OBJ_FLAG_SCROLLABLE);
+
     static lv_coord_t col_dsc[] = {110, 110, LV_GRID_TEMPLATE_LAST};
     static lv_coord_t row_dsc[] = {70, 70, 70, LV_GRID_TEMPLATE_LAST};
 
@@ -50,11 +54,11 @@ static void apply_tiles_grid(lv_obj_t * wrap)
     lv_obj_set_style_grid_row_dsc_array(wrap, row_dsc, 0);
     lv_obj_set_layout(wrap, LV_LAYOUT_GRID);
 
-    lv_obj_set_style_pad_left(wrap, 6, 0);
-    lv_obj_set_style_pad_right(wrap, 6, 0);
-    lv_obj_set_style_pad_top(wrap, 6, 0);
-    lv_obj_set_style_pad_row(wrap, 14, 0);
-    lv_obj_set_style_pad_column(wrap, 14, 0);
+    lv_obj_set_style_pad_left(wrap, 4, 0);
+    lv_obj_set_style_pad_right(wrap, 4, 0);
+    lv_obj_set_style_pad_top(wrap, 1, 0);
+    lv_obj_set_style_pad_row(wrap, 6, 0);
+    lv_obj_set_style_pad_column(wrap, 8, 0);
 
     lv_obj_clear_flag(wrap, LV_OBJ_FLAG_SCROLLABLE);
 
@@ -74,10 +78,21 @@ static void apply_tiles_grid(lv_obj_t * wrap)
     lv_obj_update_layout(wrap);
 }
 
+static void remove_scrollbars(lv_obj_t * scr)
+{
+    lv_obj_set_scrollbar_mode(scr, LV_SCROLLBAR_MODE_OFF);
+    for(uint32_t i = 0; i < lv_obj_get_child_cnt(scr); i++) {
+        lv_obj_t * tile = lv_obj_get_child(scr, i);
+        lv_obj_clear_flag(tile, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_set_scrollbar_mode(tile, LV_SCROLLBAR_MODE_OFF);
+    }
+}
+
 static void apply_grid_cb(lv_timer_t * t)
 {
     lv_obj_t * wrap = find_tiles_wrap_anywhere();
     if(wrap) {
+        remove_scrollbars(wrap);
         apply_tiles_grid(wrap);
         lv_timer_del(t); /* done */
     }
@@ -88,6 +103,26 @@ void ui_envhub_init(const char * asset_path)
     lv_xml_register_font(NULL, "plex_sans_12", plex_sans_12);
     ui_envhub_init_gen(asset_path);
 
+    time_label = find_by_name_dfs(lv_display_get_screen_active(lv_display_get_default()), "time");
+
+    // // Disable scrollbars
+    // lv_obj_t * scr = lv_display_get_screen_active(lv_display_get_default());
+    // lv_obj_set_scrollbar_mode(scr, LV_SCROLLBAR_MODE_OFF);
+
     /* The preview runtime may not have activated the screen yet; run ASAP and retry until found */
     lv_timer_create(apply_grid_cb, 1, NULL);
+}
+
+static void set_time_cb(void *p)
+{
+    const char *s = (const char *)p;
+    ui_envhub_set_time_text(s);
+    lv_free(p);
+}
+
+void ui_envhub_set_time_text_async(const char *s)
+{
+    if (!s) return;
+    char *copy = lv_strdup(s);
+    lv_async_call(set_time_cb, copy);
 }

@@ -30,6 +30,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void ui_envhub_set_time_text_async(const char *s);
 
 /**
  * Initialize the component library

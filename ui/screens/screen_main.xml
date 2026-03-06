@@ -5,12 +5,13 @@
     <style name="panel"
           bg_color="0xFFFFFF"
           border_width="1"
-          border_color="0x224455"
-          radius="12"
-          pad_left="8"
-          pad_right="8"
-          pad_top="6"
-          pad_bottom="6" />
+          border_color="0x6C8794"
+          radius="16"/>
+    <!-- pad_left="1"
+          pad_right="1"
+          pad_top="1"
+          pad_bottom="1" 
+          /> -->
 
     <style name="value_text" text_color="0x000000" />
     <style name="label_text" text_color="0x000000" />
@@ -21,80 +22,80 @@
     <style name="style_main" />
 
     <!-- Top row -->
-    <lv_obj width="160" height="34" align="top_left" x="2" y="0">
+    <lv_obj width="160" height="40" align="top_left" x="2" y="0">
       <style name="panel" />
-      <lv_label text="Wall Time" align="center">
+      <lv_label name="time" text="00:00:00" align="center">
         <style name="value_text" />
       </lv_label>
     </lv_obj>
 
-    <lv_obj width="80" height="34" align="top_right" x="-2" y="0">
+    <lv_obj width="80" height="40" align="top_right" x="-2" y="0">
       <style name="panel" />
       <lv_label text="🔋 ##%" align="center">
         <style name="value_text" />
       </lv_label>
     </lv_obj>
 
-  <!-- Tiles wrapper (positioned once) -->
-  <lv_obj name="ui_tiles_wrap" width="240" height="230" align="top_left" x="0" y="44">
-    <!-- Temperature -->
-    <lv_obj name="tile_temp" width="110" height="70">
+    <!-- Tiles wrapper (positioned once) -->
+  <lv_obj name="ui_tiles_wrap" width="240" height="240" align="top_left" x="0" y="43">
+      <!-- Temperature -->
+    <lv_obj name="tile_temp" width="108" height="70">
       <style name="panel" />
-      <lv_label text="Temperature" align="top_mid" y="2"><style name="label_text" /></lv_label>
-      <lv_label text="0°F" align="center" x="-14" y="6"><style name="value_text" /></lv_label>
+      <lv_label text="Temp (°F)" align="top_mid" y="-10"><style name="label_text" /></lv_label>
+      <lv_label text="0" align="center" x="-30" y="0"><style name="value_text" /></lv_label>
+      <lv_label text="mn 0" align="top_right" x="-15" y="6"><style name="small_text" /></lv_label>
+      <lv_label text="mx 0" align="top_right" x="-15" y="20"><style name="small_text" /></lv_label>
+      <lv_label text="av 0" align="top_right" x="-15" y="34"><style name="small_text" /></lv_label>
+    </lv_obj>
+
+      <!-- Humidity -->
+    <lv_obj name="tile_humidity" width="108" height="70">
+      <style name="panel" />
+      <lv_label text="Humidity (%)" align="top_mid" y="-10"><style name="label_text" /></lv_label>
+      <lv_label text="0%" align="center" x="-14" y="0"><style name="value_text" /></lv_label>
       <lv_label text="mn 0" align="top_right" x="-4" y="22"><style name="small_text" /></lv_label>
       <lv_label text="mx 0" align="top_right" x="-4" y="38"><style name="small_text" /></lv_label>
       <lv_label text="av 0" align="top_right" x="-4" y="54"><style name="small_text" /></lv_label>
     </lv_obj>
 
-    <!-- Humidity -->
-    <lv_obj name="tile_humidity" width="110" height="70">
+      <!-- CO2 -->
+    <lv_obj name="tile_co2" width="108" height="70">
       <style name="panel" />
-      <lv_label text="Humidity" align="top_mid" y="2"><style name="label_text" /></lv_label>
-      <lv_label text="0%" align="center" x="-14" y="6"><style name="value_text" /></lv_label>
+      <lv_label text="CO2 (ppm)" align="top_mid" y="-10"><style name="label_text" /></lv_label>
+      <lv_label text="0" align="center" x="-14" y="0"><style name="value_text" /></lv_label>
       <lv_label text="mn 0" align="top_right" x="-4" y="22"><style name="small_text" /></lv_label>
       <lv_label text="mx 0" align="top_right" x="-4" y="38"><style name="small_text" /></lv_label>
       <lv_label text="av 0" align="top_right" x="-4" y="54"><style name="small_text" /></lv_label>
     </lv_obj>
 
-    <!-- CO2 -->
-    <lv_obj name="tile_co2" width="110" height="70">
+      <!-- Pressure -->
+    <lv_obj name="tile_pressure" width="108" height="70">
       <style name="panel" />
-      <lv_label text="CO2" align="top_mid" y="2"><style name="label_text" /></lv_label>
-      <lv_label text="0 ppm" align="center" x="-14" y="6"><style name="value_text" /></lv_label>
+      <lv_label text="Press (hPa)" align="top_mid" y="-10"><style name="label_text" /></lv_label>
+      <lv_label text="0" align="center" x="-14" y="0"><style name="value_text" /></lv_label>
       <lv_label text="mn 0" align="top_right" x="-4" y="22"><style name="small_text" /></lv_label>
       <lv_label text="mx 0" align="top_right" x="-4" y="38"><style name="small_text" /></lv_label>
       <lv_label text="av 0" align="top_right" x="-4" y="54"><style name="small_text" /></lv_label>
     </lv_obj>
 
-    <!-- Pressure -->
-    <lv_obj name="tile_pressure" width="110" height="70">
+      <!-- eCO2 -->
+    <lv_obj name="tile_eco2" width="108" height="70">
       <style name="panel" />
-      <lv_label text="Pressure" align="top_mid" y="2"><style name="label_text" /></lv_label>
-      <lv_label text="0 hPa" align="center" x="-14" y="6"><style name="value_text" /></lv_label>
+      <lv_label text="eCO2 (ppm)" align="top_mid" y="-10"><style name="label_text" /></lv_label>
+      <lv_label text="0" align="center" x="-14" y="0"><style name="value_text" /></lv_label>
       <lv_label text="mn 0" align="top_right" x="-4" y="22"><style name="small_text" /></lv_label>
       <lv_label text="mx 0" align="top_right" x="-4" y="38"><style name="small_text" /></lv_label>
       <lv_label text="av 0" align="top_right" x="-4" y="54"><style name="small_text" /></lv_label>
     </lv_obj>
 
-    <!-- eCO2 -->
-    <lv_obj name="tile_eco2" width="110" height="70">
+      <!-- TVOC -->
+    <lv_obj name="tile_tvoc" width="108" height="70">
       <style name="panel" />
-      <lv_label text="eCO2" align="top_mid" y="2"><style name="label_text" /></lv_label>
-      <lv_label text="0 ppm" align="center" x="-14" y="6"><style name="value_text" /></lv_label>
-      <lv_label text="mn 0" align="top_right" x="-4" y="22"><style name="small_text" /></lv_label>
-      <lv_label text="mx 0" align="top_right" x="-4" y="38"><style name="small_text" /></lv_label>
-      <lv_label text="av 0" align="top_right" x="-4" y="54"><style name="small_text" /></lv_label>
-    </lv_obj>
-
-    <!-- TVOC -->
-    <lv_obj name="tile_tvoc" width="110" height="70">
-      <style name="panel" />
-      <lv_label text="TVOC" align="top_mid" y="2"><style name="label_text" /></lv_label>
-      <lv_label text="0 ppb" align="center" x="-14" y="6"><style name="value_text" /></lv_label>
-      <lv_label text="mn 0" align="top_right" x="-4" y="22"><style name="small_text" /></lv_label>
-      <lv_label text="mx 0" align="top_right" x="-4" y="38"><style name="small_text" /></lv_label>
-      <lv_label text="av 0" align="top_right" x="-4" y="54"><style name="small_text" /></lv_label>
+      <lv_label text="TVOC (ppb)" align="top_mid" x="0" y="-10"><style name="label_text" /></lv_label>
+      <lv_label text="0" align="center" x="-25" y="0"><style name="value_text" /></lv_label>
+      <lv_label text="mn 0" align="top_right" x="-15" y="22"><style name="small_text" /></lv_label>
+      <lv_label text="mx 0" align="top_right" x="-15" y="38"><style name="small_text" /></lv_label>
+      <lv_label text="av 0" align="top_right" x="-15" y="54"><style name="small_text" /></lv_label>
     </lv_obj>
   </lv_obj>
 
