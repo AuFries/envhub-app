@@ -2,7 +2,7 @@
  * @file ui_envhub.c
  */
 #include "ui_envhub.h"
-#include <lvgl/lvgl.h>
+
 #include <string.h>
 
 static lv_obj_t *time_label = NULL;
@@ -115,11 +115,10 @@ void ui_envhub_init(void)
     lv_xml_register_font(NULL, "plex_sans_12", plex_sans_12);
     ui_envhub_init_gen(NULL);
 
-    time_label = find_by_name_dfs(lv_display_get_screen_active(lv_display_get_default()), "time");
+    lv_obj_t *screen = screen_main_create();
+    lv_screen_load(screen);
 
-    // // Disable scrollbars
-    // lv_obj_t * scr = lv_display_get_screen_active(lv_display_get_default());
-    // lv_obj_set_scrollbar_mode(scr, LV_SCROLLBAR_MODE_OFF);
+    time_label = find_by_name_dfs(screen, "time");
 
     /* The preview runtime may not have activated the screen yet; run ASAP and retry until found */
     lv_timer_create(apply_grid_cb, 1, NULL);

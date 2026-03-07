@@ -19,9 +19,24 @@ target_include_directories(envhub-app
     src/include
 )
 
+if(EXISTS "${CMAKE_SYSROOT}/usr/include/lvgl/lv_conf.h")
+  target_include_directories(envhub-app
+    PRIVATE
+      "${CMAKE_SYSROOT}/usr/include"
+      "${CMAKE_SYSROOT}/usr/include/libdrm"
+  )
+
+  target_compile_options(envhub-app
+    PRIVATE
+      "SHELL:-include ${CMAKE_SYSROOT}/usr/include/lvgl/lv_conf.h"
+  )
+endif()
+
 target_link_libraries(envhub-app
   PRIVATE
-    envhub-ui
+    lib-ui
     Threads::Threads
     drm
 )
+
+install(TARGETS envhub-app DESTINATION /usr/bin)
