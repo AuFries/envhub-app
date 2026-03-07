@@ -112,7 +112,7 @@ static void apply_grid_cb(lv_timer_t *t)
 
 void ui_envhub_init(void)
 {
-    lv_xml_register_font(NULL, "plex_sans_12", plex_sans_12);
+    // lv_xml_register_font(NULL, "plex_sans_12", plex_sans_12);
     ui_envhub_init_gen(NULL);
 
     lv_obj_t *screen = screen_main_create();

@@ -26,9 +26,9 @@ if(EXISTS "${CMAKE_SYSROOT}/usr/include/lvgl/lv_conf.h")
       "${CMAKE_SYSROOT}/usr/include/libdrm"
   )
 
-  target_compile_options(envhub-app
+  target_compile_definitions(envhub-app
     PRIVATE
-      "SHELL:-include ${CMAKE_SYSROOT}/usr/include/lvgl/lv_conf.h"
+      LV_CONF_PATH="${CMAKE_SYSROOT}/usr/include/lvgl/lv_conf.h"
   )
 endif()
 
