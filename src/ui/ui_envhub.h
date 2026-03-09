@@ -12,7 +12,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "fonts/fonts.h"
 #include "ui_envhub_gen.h"
 
 /*********************

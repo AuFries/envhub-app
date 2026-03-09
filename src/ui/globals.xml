@@ -21,5 +21,12 @@
 
 	<fonts>
 		<!-- Add <bin> , <tiny_ttf>, <freetype> tags here -->
+		<bin name="plex_sans_12"
+             as_file="false"
+             src_path="fonts/IBMPlexSans_Condensed-Medium.ttf"
+             size="12"
+             bpp="4"
+             range="0x20-0x7F"
+             symbols="°" />
 	</fonts>
 </globals>

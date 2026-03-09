@@ -60,11 +60,6 @@ if(EXISTS "${CMAKE_SYSROOT}/usr/include/lvgl/lv_conf.h")
       LV_CONF_PATH="${CMAKE_SYSROOT}/usr/include/lvgl/lv_conf.h"
   )
 
-  target_compile_options(${LIB_NAME}
-    PRIVATE
-      "SHELL:-include ${CMAKE_CURRENT_SOURCE_DIR}/lvgl_ui_compat.h"
-  )
-
   if(NOT TARGET lvgl)
     find_library(LVGL_LIB
       NAMES lvgl liblvgl
