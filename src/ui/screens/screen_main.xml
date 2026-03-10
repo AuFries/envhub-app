@@ -41,8 +41,8 @@
       <!-- Temperature -->
     <lv_obj name="tile_temp" width="108" height="70">
       <style name="panel" />
-      <lv_label text="Temp (°F)" align="top_mid" y="-10"><style name="label_text" /></lv_label>
-      <lv_label text="0" align="center" x="-30" y="0"><style name="value_text" /></lv_label>
+      <lv_label text="Temp (°C)" align="top_mid" y="-10"><style name="label_text" /></lv_label>
+      <lv_label name="temp_value" text="0" align="center" x="-30" y="0"><style name="value_text" /></lv_label>
       <lv_label text="mn 0" align="top_right" x="-15" y="6"><style name="small_text" /></lv_label>
       <lv_label text="mx 0" align="top_right" x="-15" y="20"><style name="small_text" /></lv_label>
       <lv_label text="av 0" align="top_right" x="-15" y="34"><style name="small_text" /></lv_label>
@@ -52,7 +52,7 @@
     <lv_obj name="tile_humidity" width="108" height="70">
       <style name="panel" />
       <lv_label text="Humidity (%)" align="top_mid" y="-10"><style name="label_text" /></lv_label>
-      <lv_label text="0%" align="center" x="-14" y="0"><style name="value_text" /></lv_label>
+      <lv_label name="humidity_value" text="0%" align="center" x="-14" y="0"><style name="value_text" /></lv_label>
       <lv_label text="mn 0" align="top_right" x="-4" y="22"><style name="small_text" /></lv_label>
       <lv_label text="mx 0" align="top_right" x="-4" y="38"><style name="small_text" /></lv_label>
       <lv_label text="av 0" align="top_right" x="-4" y="54"><style name="small_text" /></lv_label>
@@ -62,7 +62,7 @@
     <lv_obj name="tile_co2" width="108" height="70">
       <style name="panel" />
       <lv_label text="CO2 (ppm)" align="top_mid" y="-10"><style name="label_text" /></lv_label>
-      <lv_label text="0" align="center" x="-14" y="0"><style name="value_text" /></lv_label>
+      <lv_label name="co2_value" text="0" align="center" x="-14" y="0"><style name="value_text" /></lv_label>
       <lv_label text="mn 0" align="top_right" x="-4" y="22"><style name="small_text" /></lv_label>
       <lv_label text="mx 0" align="top_right" x="-4" y="38"><style name="small_text" /></lv_label>
       <lv_label text="av 0" align="top_right" x="-4" y="54"><style name="small_text" /></lv_label>

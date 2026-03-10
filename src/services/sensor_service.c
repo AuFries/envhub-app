@@ -113,9 +113,11 @@ static void *sensor_thread_main(void *arg)
             ? SENSOR_STATUS_OK
             : SENSOR_STATUS_ERROR;
 
-        pthread_mutex_lock(&sensor_mutex);
-        snapshot = next;
-        pthread_mutex_unlock(&sensor_mutex);
+        if (next.scd30.status != SENSOR_STATUS_ERROR) {
+            pthread_mutex_lock(&sensor_mutex);
+            snapshot = next;
+            pthread_mutex_unlock(&sensor_mutex);
+        }
 
         sleep(2);
     }
@@ -132,7 +134,7 @@ static bool read_scd30(sensor_scd30_t *out)
     if (!out)
         return false;
 
-    if (!read_int_from_file(SCD30_CO2_RAW_PATH, &co2_raw))
+    if (!read_int_from_file(SCD30_CO2_RAW_PATH, &co2_raw)) 
         return false;
 
     if (!read_int_from_file(SCD30_TEMP_PATH, &temp_milli))

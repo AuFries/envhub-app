@@ -1,9 +1,10 @@
 /**
  * @file ui_envhub.c
  */
-#include "ui_envhub.h"
-
+#include <stdio.h>
 #include <string.h>
+
+#include "ui_envhub.h"
 
 
 static lv_obj_t *time_label = NULL;
