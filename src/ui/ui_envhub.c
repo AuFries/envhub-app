@@ -5,7 +5,16 @@
 
 #include <string.h>
 
+
 static lv_obj_t *time_label = NULL;
+static lv_obj_t *co2_label = NULL;
+static lv_obj_t *temp_label = NULL;
+static lv_obj_t *humidity_label = NULL;
+static lv_obj_t *power_label = NULL;
+static lv_obj_t *current_label = NULL;
+static lv_obj_t *voltage_label = NULL;
+
+static void bind_sensor_labels(lv_obj_t *screen);
 
 static lv_obj_t *find_by_name_dfs(lv_obj_t *root, const char *target)
 {
@@ -120,13 +129,46 @@ void ui_envhub_init(void)
 
     time_label = find_by_name_dfs(screen, "time");
 
-    /* The preview runtime may not have activated the screen yet; run ASAP and retry until found */
+    bind_sensor_labels(screen);
+
+    // Layout fixup
     lv_timer_create(apply_grid_cb, 1, NULL);
 }
 
+static void bind_sensor_labels(lv_obj_t *screen)
+{
+    if (!screen)
+        return;
+
+    co2_label      = find_by_name_dfs(screen, "co2_value");
+    temp_label     = find_by_name_dfs(screen, "temp_value");
+    humidity_label = find_by_name_dfs(screen, "humidity_value");
+    // power_label    = find_by_name_dfs(screen, "power_value");
+    // current_label  = find_by_name_dfs(screen, "current_value");
+    // voltage_label  = find_by_name_dfs(screen, "voltage_value");
+}
+
+// TODO: update this to instead just read from the system time
 void ui_envhub_set_time_text(const char *s)
 {
-    if(time_label && s) {
-        lv_label_set_text(time_label, s);
+}
+
+void ui_envhub_set_scd30(float co2_ppm, float temp_c, float humidity_rh)
+{
+    char buf[32];
+
+    if (co2_label) {
+        snprintf(buf, sizeof(buf), "%.0f", co2_ppm);
+        lv_label_set_text(co2_label, buf);
+    }
+
+    if (temp_label) {
+        snprintf(buf, sizeof(buf), "%.1f", temp_c);
+        lv_label_set_text(temp_label, buf);
+    }
+
+    if (humidity_label) {
+        snprintf(buf, sizeof(buf), "%.1f", humidity_rh);
+        lv_label_set_text(humidity_label, buf);
     }
 }

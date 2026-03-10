@@ -10,7 +10,7 @@ add_subdirectory(src/ui)
 
 add_executable(envhub-app
   src/main.c
-  src/services/time_service.c
+  src/services/sensor_service.c
 )
 
 target_include_directories(envhub-app
