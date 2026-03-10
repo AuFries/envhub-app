@@ -10,6 +10,8 @@
 #include "sensor_service.h"
 #include "log.h"
 
+#define UPDATE_INTERVAL_SECONDS 2
+
 // TODO: this is likely variable and should be auto-detected
 #define SCD30_BASE "/sys/bus/iio/devices/iio:device2"
 
@@ -120,7 +122,7 @@ static void *sensor_thread_main(void *arg)
             pthread_mutex_unlock(&sensor_mutex);
         }
 
-        sleep(2);
+        sleep(UPDATE_INTERVAL_SECONDS);
     }
 
     return NULL;
