@@ -13,6 +13,7 @@
 
 #include "services/sensor_service.h"
 #include "ui/ui_envhub.h"
+#include "log.h"
 
 static volatile bool g_run = true;
 
@@ -36,6 +37,7 @@ int main(int argc, char **argv)
     if(lvgl_drm_init(argc, argv) != 0) {
         return 1;
     }
+    openlog("envhub-app", LOG_PID | LOG_CONS, LOG_DAEMON);
 
     sensor_service_init();
     sensor_service_start();
@@ -49,6 +51,7 @@ int main(int argc, char **argv)
         usleep(5000);
     }
 
+    closelog();
     return 0;
 }
 

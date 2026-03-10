@@ -8,6 +8,7 @@
 #include <unistd.h>
 
 #include "sensor_service.h"
+#include "log.h"
 
 // TODO: this is likely variable and should be auto-detected
 #define SCD30_BASE "/sys/bus/iio/devices/iio:device2"
@@ -147,6 +148,7 @@ static bool read_scd30(sensor_scd30_t *out)
     out->temperature_c = temp_milli / 1000.0f;
     out->humidity_rh = humid_milli / 1000.0f;
 
+    LOGD("Read SCD30: CO2=%.1f ppm, Temp=%.1f C, Humidity=%.1f %%", out->co2_ppm, out->temperature_c, out->humidity_rh);
     return true;
 }
 
