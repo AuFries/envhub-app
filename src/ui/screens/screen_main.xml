@@ -31,7 +31,7 @@
 
     <lv_obj width="80" height="40" align="top_right" x="-2" y="0">
       <style name="panel" />
-      <lv_label text="🔋 ##%" align="center">
+      <lv_label name="battery_capacity" text="0%" align="center">
         <style name="value_text" />
       </lv_label>
     </lv_obj>

@@ -7,8 +7,8 @@
 
 #include "ui_envhub.h"
 
-
 static lv_obj_t *time_label = NULL;
+static lv_obj_t *battery_capacity_label = NULL;
 static lv_obj_t *co2_label = NULL;
 static lv_obj_t *temp_label = NULL;
 static lv_obj_t *humidity_label = NULL;
@@ -146,8 +146,9 @@ static void bind_sensor_labels(lv_obj_t *screen)
     if (!screen)
         return;
 
-    co2_label      = find_by_name_dfs(screen, "co2_value");
-    temp_label     = find_by_name_dfs(screen, "temp_value");
+    battery_capacity_label = find_by_name_dfs(screen, "battery_capacity");
+    co2_label = find_by_name_dfs(screen, "co2_value");
+    temp_label = find_by_name_dfs(screen, "temp_value");
     humidity_label = find_by_name_dfs(screen, "humidity_value");
     // power_label    = find_by_name_dfs(screen, "power_value");
     // current_label  = find_by_name_dfs(screen, "current_value");
@@ -167,33 +168,39 @@ void ui_envhub_set_time_text(const char *s)
     if (!time_label)
         return;
 
-    if (!lv_obj_is_valid(time_label)) {
+    if (!lv_obj_is_valid(time_label))
+    {
         time_label = NULL;
         return;
     }
 
-    if (lv_obj_get_screen(time_label) == NULL) {
+    if (lv_obj_get_screen(time_label) == NULL)
+    {
         return;
     }
 
-    if (s) {
+    if (s)
+    {
         lv_label_set_text(time_label, s);
         return;
     }
 
     time_t now = time(NULL);
-    if (now == (time_t)-1) {
+    if (now == (time_t)-1)
+    {
         lv_label_set_text(time_label, "--");
         return;
     }
 
     struct tm tm_now;
-    if (!localtime_r(&now, &tm_now)) {
+    if (!localtime_r(&now, &tm_now))
+    {
         lv_label_set_text(time_label, "--");
         return;
     }
 
-    if (strftime(buf, sizeof(buf), "%b %e %H:%M", &tm_now) == 0) {
+    if (strftime(buf, sizeof(buf), "%b %e %H:%M", &tm_now) == 0)
+    {
         lv_label_set_text(time_label, "--");
         return;
     }
@@ -201,21 +208,38 @@ void ui_envhub_set_time_text(const char *s)
     lv_label_set_text(time_label, buf);
 }
 
+void ui_envhub_set_bq27441(uint8_t capacity_percent,float voltage_v,float current_ma)
+{
+    char buf[32];
+
+    (void)voltage_v;
+    (void)current_ma;
+
+    if (battery_capacity_label)
+    {
+        snprintf(buf, sizeof(buf), "%u%%", capacity_percent);
+        lv_label_set_text(battery_capacity_label, buf);
+    }
+}
+
 void ui_envhub_set_scd30(float co2_ppm, float temp_c, float humidity_rh)
 {
     char buf[32];
 
-    if (co2_label) {
+    if (co2_label)
+    {
         snprintf(buf, sizeof(buf), "%.0f", co2_ppm);
         lv_label_set_text(co2_label, buf);
     }
 
-    if (temp_label) {
+    if (temp_label)
+    {
         snprintf(buf, sizeof(buf), "%.1f", temp_c);
         lv_label_set_text(temp_label, buf);
     }
 
-    if (humidity_label) {
+    if (humidity_label)
+    {
         snprintf(buf, sizeof(buf), "%.1f", humidity_rh);
         lv_label_set_text(humidity_label, buf);
     }

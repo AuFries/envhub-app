@@ -4,11 +4,26 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+
 typedef enum {
     SENSOR_STATUS_UNINITIALIZED,
     SENSOR_STATUS_OK,
     SENSOR_STATUS_ERROR,
 } sensor_status_t;
+
+typedef enum {
+    BATTERY_STATUS_UNKNOWN,
+    BATTERY_STATUS_CHARGING,
+    BATTERY_STATUS_DISCHARGING,
+    BATTERY_STATUS_FULL,
+} battery_status_t;
+
+typedef struct {
+    battery_status_t status;
+    uint8_t capacity_percent;
+    float voltage_v;
+    float current_ma;
+} fuel_gauge_bq27441_t;
 
 typedef struct {
     float humidity_rh;
@@ -18,6 +33,7 @@ typedef struct {
 } sensor_scd30_t;
 
 typedef struct {
+    fuel_gauge_bq27441_t bq27441;
     sensor_scd30_t scd30;
     // uint64_t update_ms; // timestamp instead?
 } sensor_snapshot_t;

@@ -12,6 +12,12 @@
 
 #define UPDATE_INTERVAL_SECONDS 2
 
+#define BQ27441_BASE "/sys/class/power_supply/bq27441-0"
+#define BQ27441_STATUS_PATH   BQ27441_BASE "/status"
+#define BQ27441_CAPACITY_PATH BQ27441_BASE "/capacity"
+#define BQ27441_VOLTAGE_PATH  BQ27441_BASE "/voltage_now"
+#define BQ27441_CURRENT_PATH  BQ27441_BASE "/current_now"
+
 // TODO: this is likely variable and should be auto-detected
 #define SCD30_BASE "/sys/bus/iio/devices/iio:device2"
 
@@ -26,6 +32,7 @@ static sensor_snapshot_t snapshot;
 static bool running = false;
 
 static void *sensor_thread_main(void *arg);
+static bool read_bq27441(fuel_gauge_bq27441_t *out);
 static bool read_scd30(sensor_scd30_t *out);
 static bool read_int_from_file(const char *path, int *out);
 static bool read_float_from_file(const char *path, float *out);
@@ -116,17 +123,71 @@ static void *sensor_thread_main(void *arg)
             ? SENSOR_STATUS_OK
             : SENSOR_STATUS_ERROR;
 
-        if (next.scd30.status != SENSOR_STATUS_ERROR) {
-            pthread_mutex_lock(&sensor_mutex);
-            snapshot = next;
-            pthread_mutex_unlock(&sensor_mutex);
-        }
+        (void)read_bq27441(&next.bq27441);
+
+        pthread_mutex_lock(&sensor_mutex);
+        snapshot = next;
+        pthread_mutex_unlock(&sensor_mutex);
 
         sleep(UPDATE_INTERVAL_SECONDS);
     }
 
     return NULL;
 }
+
+static bool read_bq27441(fuel_gauge_bq27441_t *out)
+{
+    char status_buf[32];
+    int capacity = 0;
+    int voltage_uv = 0;
+    int current_ua = 0;
+
+    if (!out)
+        return false;
+
+    memset(out, 0, sizeof(*out));
+    out->status = BATTERY_STATUS_UNKNOWN;
+
+    if (!read_file_text(BQ27441_STATUS_PATH, status_buf, sizeof(status_buf)))
+        return false;
+
+    if (!read_int_from_file(BQ27441_CAPACITY_PATH, &capacity))
+        return false;
+
+    if (!read_int_from_file(BQ27441_VOLTAGE_PATH, &voltage_uv))
+        return false;
+
+    if (!read_int_from_file(BQ27441_CURRENT_PATH, &current_ua))
+        return false;
+
+    if (strcmp(status_buf, "Charging") == 0) {
+        out->status = BATTERY_STATUS_CHARGING;
+    } else if (strcmp(status_buf, "Discharging") == 0) {
+        out->status = BATTERY_STATUS_DISCHARGING;
+    } else if (strcmp(status_buf, "Full") == 0) {
+        out->status = BATTERY_STATUS_FULL;
+    } else {
+        out->status = BATTERY_STATUS_UNKNOWN;
+    }
+
+    if (capacity < 0)
+        capacity = 0;
+    else if (capacity > 100)
+        capacity = 100;
+
+    out->capacity_percent = (uint8_t)capacity;
+    out->voltage_v = voltage_uv / 1000000.0f;
+    out->current_ma = current_ua / 1000.0f;
+
+    LOGD("Read BQ27441: status=%s, capacity=%u%%, voltage=%.3f V, current=%.1f mA",
+         status_buf,
+         out->capacity_percent,
+         out->voltage_v,
+         out->current_ma);
+
+    return true;
+}
+
 
 static bool read_scd30(sensor_scd30_t *out)
 {
