@@ -49,6 +49,8 @@ extern "C" {
 
 extern lv_font_t * plex_sans_12;
 
+extern lv_font_t * plex_sans_24;
+
 /*----------------
  * Images
  *----------------*/

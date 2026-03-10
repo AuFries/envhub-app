@@ -49,6 +49,8 @@
 
 lv_font_t * plex_sans_12;
 extern lv_font_t plex_sans_12_data;
+lv_font_t * plex_sans_24;
+extern lv_font_t plex_sans_24_data;
 
 /*----------------
  * Images
@@ -80,6 +82,8 @@ void ui_envhub_init_gen(const char * asset_path)
 
     /* get font 'plex_sans_12' from a C array */
     plex_sans_12 = &plex_sans_12_data;
+    /* get font 'plex_sans_24' from a C array */
+    plex_sans_24 = &plex_sans_24_data;
 
 
     /*----------------
@@ -97,6 +101,7 @@ void ui_envhub_init_gen(const char * asset_path)
 
     /* Register fonts */
     lv_xml_register_font(NULL, "plex_sans_12", plex_sans_12);
+    lv_xml_register_font(NULL, "plex_sans_24", plex_sans_24);
 
     /* Register subjects */
 

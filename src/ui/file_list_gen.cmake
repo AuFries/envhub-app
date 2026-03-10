@@ -5,4 +5,5 @@ list(
   ${CMAKE_CURRENT_LIST_DIR}/screens/screen_secondary_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/ui_envhub_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/ui_envhub.c
-  ${CMAKE_CURRENT_LIST_DIR}/fonts/plex_sans_12_data.c)
+  ${CMAKE_CURRENT_LIST_DIR}/fonts/plex_sans_12_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/fonts/plex_sans_24_data.c)
