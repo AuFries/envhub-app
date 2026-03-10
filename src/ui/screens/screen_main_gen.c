@@ -79,7 +79,7 @@ lv_obj_t * screen_main_create(void)
     lv_obj_add_style(lv_obj_1, &panel, 0);
     lv_obj_t * time = lv_label_create(lv_obj_1);
     lv_obj_set_name(time, "time");
-    lv_label_set_text(time, "00:00:00");
+    lv_label_set_text(time, "Jan 1 00:00");
     lv_obj_set_align(time, LV_ALIGN_CENTER);
     lv_obj_add_style(time, &value_text, 0);
     

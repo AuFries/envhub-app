@@ -24,7 +24,7 @@
     <!-- Top row -->
     <lv_obj width="160" height="40" align="top_left" x="2" y="0">
       <style name="panel" />
-      <lv_label name="time" text="00:00:00" align="center">
+      <lv_label name="time" text="Jan 1 00:00" align="center">
         <style name="value_text" />
       </lv_label>
     </lv_obj>

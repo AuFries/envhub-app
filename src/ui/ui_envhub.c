@@ -3,6 +3,7 @@
  */
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include "ui_envhub.h"
 
@@ -16,6 +17,7 @@ static lv_obj_t *current_label = NULL;
 static lv_obj_t *voltage_label = NULL;
 
 static void bind_sensor_labels(lv_obj_t *screen);
+static void time_update_cb(lv_timer_t *t);
 
 static lv_obj_t *find_by_name_dfs(lv_obj_t *root, const char *target)
 {
@@ -132,7 +134,10 @@ void ui_envhub_init(void)
 
     bind_sensor_labels(screen);
 
-    // Layout fixup
+    ui_envhub_set_time_text(NULL);
+    lv_timer_create(time_update_cb, 60000, NULL);
+
+    /* Layout fixup */
     lv_timer_create(apply_grid_cb, 1, NULL);
 }
 
@@ -149,9 +154,51 @@ static void bind_sensor_labels(lv_obj_t *screen)
     // voltage_label  = find_by_name_dfs(screen, "voltage_value");
 }
 
-// TODO: update this to instead just read from the system time
+static void time_update_cb(lv_timer_t *t)
+{
+    (void)t;
+    ui_envhub_set_time_text(NULL);
+}
+
 void ui_envhub_set_time_text(const char *s)
 {
+    char buf[32];
+
+    if (!time_label)
+        return;
+
+    if (!lv_obj_is_valid(time_label)) {
+        time_label = NULL;
+        return;
+    }
+
+    if (lv_obj_get_screen(time_label) == NULL) {
+        return;
+    }
+
+    if (s) {
+        lv_label_set_text(time_label, s);
+        return;
+    }
+
+    time_t now = time(NULL);
+    if (now == (time_t)-1) {
+        lv_label_set_text(time_label, "--");
+        return;
+    }
+
+    struct tm tm_now;
+    if (!localtime_r(&now, &tm_now)) {
+        lv_label_set_text(time_label, "--");
+        return;
+    }
+
+    if (strftime(buf, sizeof(buf), "%b %e %H:%M", &tm_now) == 0) {
+        lv_label_set_text(time_label, "--");
+        return;
+    }
+
+    lv_label_set_text(time_label, buf);
 }
 
 void ui_envhub_set_scd30(float co2_ppm, float temp_c, float humidity_rh)
