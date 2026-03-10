@@ -12,6 +12,8 @@ static lv_obj_t *battery_capacity_label = NULL;
 static lv_obj_t *co2_label = NULL;
 static lv_obj_t *temp_label = NULL;
 static lv_obj_t *humidity_label = NULL;
+static lv_obj_t *pressure_label = NULL;
+
 static lv_obj_t *power_label = NULL;
 static lv_obj_t *current_label = NULL;
 static lv_obj_t *voltage_label = NULL;
@@ -150,6 +152,8 @@ static void bind_sensor_labels(lv_obj_t *screen)
     co2_label = find_by_name_dfs(screen, "co2_value");
     temp_label = find_by_name_dfs(screen, "temp_value");
     humidity_label = find_by_name_dfs(screen, "humidity_value");
+    pressure_label = find_by_name_dfs(screen, "pressure_value");
+
     // power_label    = find_by_name_dfs(screen, "power_value");
     // current_label  = find_by_name_dfs(screen, "current_value");
     // voltage_label  = find_by_name_dfs(screen, "voltage_value");
@@ -242,5 +246,16 @@ void ui_envhub_set_scd30(float co2_ppm, float temp_c, float humidity_rh)
     {
         snprintf(buf, sizeof(buf), "%.1f", humidity_rh);
         lv_label_set_text(humidity_label, buf);
+    }
+}
+
+void ui_envhub_set_bmp580(float pressure_hpa, float temperature_c) {
+
+    char buf[32];
+
+    if (pressure_label)
+    {
+        snprintf(buf, sizeof(buf), "%.1f", pressure_hpa);
+        lv_label_set_text(pressure_label, buf);
     }
 }

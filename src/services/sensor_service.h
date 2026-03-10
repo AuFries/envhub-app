@@ -19,10 +19,10 @@ typedef enum {
 } battery_status_t;
 
 typedef struct {
-    battery_status_t status;
     uint8_t capacity_percent;
     float voltage_v;
     float current_ma;
+    battery_status_t status;
 } fuel_gauge_bq27441_t;
 
 typedef struct {
@@ -33,8 +33,15 @@ typedef struct {
 } sensor_scd30_t;
 
 typedef struct {
+    float temperature_c;
+    float pressure_hpa;
+    sensor_status_t status;
+} sensor_bmp580_t;
+
+typedef struct {
     fuel_gauge_bq27441_t bq27441;
     sensor_scd30_t scd30;
+    sensor_bmp580_t bmp580;
     // uint64_t update_ms; // timestamp instead?
 } sensor_snapshot_t;
 

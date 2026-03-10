@@ -171,49 +171,50 @@ lv_obj_t * screen_main_create(void)
     lv_obj_set_y(lv_label_3, -12);
     lv_obj_add_style(lv_label_3, &label_text, 0);
     
-    lv_obj_t * lv_label_4 = lv_label_create(tile_pressure);
-    lv_label_set_text(lv_label_4, "0");
-    lv_obj_set_align(lv_label_4, LV_ALIGN_CENTER);
-    lv_obj_set_x(lv_label_4, 0);
-    lv_obj_set_y(lv_label_4, 5);
-    lv_obj_add_style(lv_label_4, &value_text, 0);
+    lv_obj_t * pressure_value = lv_label_create(tile_pressure);
+    lv_obj_set_name(pressure_value, "pressure_value");
+    lv_label_set_text(pressure_value, "0");
+    lv_obj_set_align(pressure_value, LV_ALIGN_CENTER);
+    lv_obj_set_x(pressure_value, 0);
+    lv_obj_set_y(pressure_value, 5);
+    lv_obj_add_style(pressure_value, &value_text, 0);
     
     lv_obj_t * tile_eco2 = lv_obj_create(ui_tiles_wrap);
     lv_obj_set_name(tile_eco2, "tile_eco2");
     lv_obj_set_width(tile_eco2, 108);
     lv_obj_set_height(tile_eco2, 70);
     lv_obj_add_style(tile_eco2, &panel, 0);
-    lv_obj_t * lv_label_5 = lv_label_create(tile_eco2);
-    lv_label_set_text(lv_label_5, "eCO2 (ppm)");
-    lv_obj_set_align(lv_label_5, LV_ALIGN_TOP_MID);
-    lv_obj_set_y(lv_label_5, -12);
-    lv_obj_add_style(lv_label_5, &label_text, 0);
+    lv_obj_t * lv_label_4 = lv_label_create(tile_eco2);
+    lv_label_set_text(lv_label_4, "eCO2 (ppm)");
+    lv_obj_set_align(lv_label_4, LV_ALIGN_TOP_MID);
+    lv_obj_set_y(lv_label_4, -12);
+    lv_obj_add_style(lv_label_4, &label_text, 0);
     
-    lv_obj_t * lv_label_6 = lv_label_create(tile_eco2);
-    lv_label_set_text(lv_label_6, "0");
-    lv_obj_set_align(lv_label_6, LV_ALIGN_CENTER);
-    lv_obj_set_x(lv_label_6, 0);
-    lv_obj_set_y(lv_label_6, 5);
-    lv_obj_add_style(lv_label_6, &value_text, 0);
+    lv_obj_t * lv_label_5 = lv_label_create(tile_eco2);
+    lv_label_set_text(lv_label_5, "0");
+    lv_obj_set_align(lv_label_5, LV_ALIGN_CENTER);
+    lv_obj_set_x(lv_label_5, 0);
+    lv_obj_set_y(lv_label_5, 5);
+    lv_obj_add_style(lv_label_5, &value_text, 0);
     
     lv_obj_t * tile_tvoc = lv_obj_create(ui_tiles_wrap);
     lv_obj_set_name(tile_tvoc, "tile_tvoc");
     lv_obj_set_width(tile_tvoc, 108);
     lv_obj_set_height(tile_tvoc, 70);
     lv_obj_add_style(tile_tvoc, &panel, 0);
-    lv_obj_t * lv_label_7 = lv_label_create(tile_tvoc);
-    lv_label_set_text(lv_label_7, "TVOC (ppb)");
-    lv_obj_set_align(lv_label_7, LV_ALIGN_TOP_MID);
-    lv_obj_set_x(lv_label_7, 0);
-    lv_obj_set_y(lv_label_7, -12);
-    lv_obj_add_style(lv_label_7, &label_text, 0);
+    lv_obj_t * lv_label_6 = lv_label_create(tile_tvoc);
+    lv_label_set_text(lv_label_6, "TVOC (ppb)");
+    lv_obj_set_align(lv_label_6, LV_ALIGN_TOP_MID);
+    lv_obj_set_x(lv_label_6, 0);
+    lv_obj_set_y(lv_label_6, -12);
+    lv_obj_add_style(lv_label_6, &label_text, 0);
     
-    lv_obj_t * lv_label_8 = lv_label_create(tile_tvoc);
-    lv_label_set_text(lv_label_8, "0");
-    lv_obj_set_align(lv_label_8, LV_ALIGN_CENTER);
-    lv_obj_set_x(lv_label_8, 0);
-    lv_obj_set_y(lv_label_8, 5);
-    lv_obj_add_style(lv_label_8, &value_text, 0);
+    lv_obj_t * lv_label_7 = lv_label_create(tile_tvoc);
+    lv_label_set_text(lv_label_7, "0");
+    lv_obj_set_align(lv_label_7, LV_ALIGN_CENTER);
+    lv_obj_set_x(lv_label_7, 0);
+    lv_obj_set_y(lv_label_7, 5);
+    lv_obj_add_style(lv_label_7, &value_text, 0);
     
     lv_obj_t * lv_obj_3 = lv_obj_create(lv_obj_0);
     lv_obj_set_width(lv_obj_3, 240);
@@ -222,11 +223,11 @@ lv_obj_t * screen_main_create(void)
     lv_obj_set_x(lv_obj_3, 0);
     lv_obj_set_y(lv_obj_3, 0);
     lv_obj_add_style(lv_obj_3, &panel, 0);
-    lv_obj_t * lv_label_9 = lv_label_create(lv_obj_3);
-    lv_label_set_text(lv_label_9, "Status: {status message}");
-    lv_obj_set_align(lv_label_9, LV_ALIGN_LEFT_MID);
-    lv_obj_set_x(lv_label_9, 6);
-    lv_obj_add_style(lv_label_9, &label_text, 0);
+    lv_obj_t * lv_label_8 = lv_label_create(lv_obj_3);
+    lv_label_set_text(lv_label_8, "Status: {status message}");
+    lv_obj_set_align(lv_label_8, LV_ALIGN_LEFT_MID);
+    lv_obj_set_x(lv_label_8, 6);
+    lv_obj_add_style(lv_label_8, &label_text, 0);
 
     LV_TRACE_OBJ_CREATE("finished");
 

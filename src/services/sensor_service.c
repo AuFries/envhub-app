@@ -26,6 +26,13 @@
 #define SCD30_HUMID_PATH     SCD30_BASE "/in_humidityrelative_input"
 #define SCD30_CO2_SCALE_PATH SCD30_BASE "/in_concentration_co2_scale"
 
+// TODO: this is likely variable and should be auto-detected
+#define BMP580_BASE "/sys/bus/iio/devices/iio:device0"
+
+#define BMP580_PRESSURE_PATH BMP580_BASE "/in_pressure_input"
+#define BMP580_TEMP_PATH     BMP580_BASE "/in_temp_input"
+
+
 static pthread_t sensor_thread;
 static pthread_mutex_t sensor_mutex = PTHREAD_MUTEX_INITIALIZER;
 static sensor_snapshot_t snapshot;
@@ -34,6 +41,7 @@ static bool running = false;
 static void *sensor_thread_main(void *arg);
 static bool read_bq27441(fuel_gauge_bq27441_t *out);
 static bool read_scd30(sensor_scd30_t *out);
+static bool read_bmp580(sensor_bmp580_t *out);
 static bool read_int_from_file(const char *path, int *out);
 static bool read_float_from_file(const char *path, float *out);
 static bool read_file_text(const char *path, char *buf, size_t buf_sz);
@@ -44,6 +52,7 @@ bool sensor_service_init(void)
 
     memset(&snapshot, 0, sizeof(snapshot));
     snapshot.scd30.status = SENSOR_STATUS_UNINITIALIZED;
+    snapshot.bmp580.status = SENSOR_STATUS_UNINITIALIZED;
 
     running = false;
 
@@ -72,6 +81,7 @@ bool sensor_service_start(void)
         pthread_mutex_lock(&sensor_mutex);
         running = false;
         snapshot.scd30.status = SENSOR_STATUS_ERROR;
+        snapshot.bmp580.status = SENSOR_STATUS_ERROR;
         pthread_mutex_unlock(&sensor_mutex);
         return false;
     }
@@ -120,6 +130,10 @@ static void *sensor_thread_main(void *arg)
             break;
 
         next.scd30.status = read_scd30(&next.scd30)
+            ? SENSOR_STATUS_OK
+            : SENSOR_STATUS_ERROR;
+
+        next.bmp580.status = read_bmp580(&next.bmp580)
             ? SENSOR_STATUS_OK
             : SENSOR_STATUS_ERROR;
 
@@ -215,6 +229,36 @@ static bool read_scd30(sensor_scd30_t *out)
     return true;
 }
 
+static bool read_bmp580(sensor_bmp580_t *out)
+{
+    float pressure_kpa = 0.0f;
+    int temp_milli = 0;
+
+    if (!out)
+        return false;
+
+    memset(out, 0, sizeof(*out));
+
+    /*
+     * Linux IIO conventions here are:
+     *   in_pressure_input -> kPa
+     *   in_temp_input     -> millidegrees C
+     */
+    if (!read_float_from_file(BMP580_PRESSURE_PATH, &pressure_kpa))
+        return false;
+
+    if (!read_int_from_file(BMP580_TEMP_PATH, &temp_milli))
+        return false;
+
+    out->pressure_hpa = pressure_kpa * 10.0f;
+    out->temperature_c = temp_milli / 1000.0f;
+
+    LOGD("Read BMP580: Pressure=%.2f hPa, Temp=%.2f C",
+         out->pressure_hpa,
+         out->temperature_c);
+
+    return true;
+}
 
 static bool read_int_from_file(const char *path, int *out)
 {
@@ -275,6 +319,11 @@ static bool read_file_text(const char *path, char *buf, size_t buf_sz)
 
     if (n <= 0)
         return false;
+
+    while (n > 0 && (buf[n - 1] == '\n' || buf[n - 1] == '\r' ||
+                     buf[n - 1] == ' '  || buf[n - 1] == '\t')) {
+        n--;
+    }
 
     buf[n] = '\0';
     return true;

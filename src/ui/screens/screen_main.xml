@@ -63,7 +63,7 @@
     <lv_obj name="tile_pressure" width="108" height="70">
       <style name="panel" />
       <lv_label text="Press (hPa)" align="top_mid" y="-12"><style name="label_text" /></lv_label>
-      <lv_label text="0" align="center" x="0" y="5"><style name="value_text" /></lv_label>
+      <lv_label name="pressure_value" text="0" align="center" x="0" y="5"><style name="value_text" /></lv_label>
     </lv_obj>
 
       <!-- eCO2 -->

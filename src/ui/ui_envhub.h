@@ -33,7 +33,9 @@ void ui_envhub_init(void);
 
 void ui_envhub_set_time_text(const char *s);
 void ui_envhub_set_scd30(float co2_ppm, float temp_c, float humidity_rh);
+void ui_envhub_set_bmp580(float pressure_hpa, float temperature_c);
 void ui_envhub_set_bq27441(uint8_t capacity_percent,float voltage_v,float current_ma);
+
 
 /**
  * Initialize the component library

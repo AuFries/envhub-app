@@ -32,6 +32,9 @@ static void app_sensor_timer_cb(lv_timer_t *t)
     if (snap.scd30.status == SENSOR_STATUS_OK) {
         ui_envhub_set_scd30(snap.scd30.co2_ppm, snap.scd30.temperature_c, snap.scd30.humidity_rh);
     }
+    if (snap.bmp580.status == SENSOR_STATUS_OK) {
+        ui_envhub_set_bmp580(snap.bmp580.pressure_hpa, snap.bmp580.temperature_c);
+    }
     ui_envhub_set_bq27441(snap.bq27441.capacity_percent, snap.bq27441.voltage_v, snap.bq27441.current_ma);
 }
 
