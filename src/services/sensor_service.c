@@ -32,6 +32,11 @@
 #define BMP580_PRESSURE_PATH BMP580_BASE "/in_pressure_input"
 #define BMP580_TEMP_PATH     BMP580_BASE "/in_temp_input"
 
+// TODO: this is likely variable and should be auto-detected
+#define SGP30_BASE "/sys/bus/iio/devices/iio:device1"
+
+#define SGP30_ECO2_PATH SGP30_BASE "/in_concentration_co2_input"
+#define SGP30_TVOC_PATH SGP30_BASE "/in_concentration_voc_input"
 
 static pthread_t sensor_thread;
 static pthread_mutex_t sensor_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -42,6 +47,7 @@ static void *sensor_thread_main(void *arg);
 static bool read_bq27441(fuel_gauge_bq27441_t *out);
 static bool read_scd30(sensor_scd30_t *out);
 static bool read_bmp580(sensor_bmp580_t *out);
+static bool read_sgp30(sensor_sgp30_t *out);
 static bool read_int_from_file(const char *path, int *out);
 static bool read_float_from_file(const char *path, float *out);
 static bool read_file_text(const char *path, char *buf, size_t buf_sz);
@@ -53,7 +59,8 @@ bool sensor_service_init(void)
     memset(&snapshot, 0, sizeof(snapshot));
     snapshot.scd30.status = SENSOR_STATUS_UNINITIALIZED;
     snapshot.bmp580.status = SENSOR_STATUS_UNINITIALIZED;
-
+    snapshot.sgp30.status = SENSOR_STATUS_UNINITIALIZED;
+    
     running = false;
 
     pthread_mutex_unlock(&sensor_mutex);
@@ -82,6 +89,7 @@ bool sensor_service_start(void)
         running = false;
         snapshot.scd30.status = SENSOR_STATUS_ERROR;
         snapshot.bmp580.status = SENSOR_STATUS_ERROR;
+        snapshot.sgp30.status = SENSOR_STATUS_ERROR;
         pthread_mutex_unlock(&sensor_mutex);
         return false;
     }
@@ -134,6 +142,10 @@ static void *sensor_thread_main(void *arg)
             : SENSOR_STATUS_ERROR;
 
         next.bmp580.status = read_bmp580(&next.bmp580)
+            ? SENSOR_STATUS_OK
+            : SENSOR_STATUS_ERROR;
+
+        next.sgp30.status = read_sgp30(&next.sgp30)
             ? SENSOR_STATUS_OK
             : SENSOR_STATUS_ERROR;
 
@@ -256,6 +268,32 @@ static bool read_bmp580(sensor_bmp580_t *out)
     LOGD("Read BMP580: Pressure=%.2f hPa, Temp=%.2f C",
          out->pressure_hpa,
          out->temperature_c);
+
+    return true;
+}
+
+static bool read_sgp30(sensor_sgp30_t *out)
+{
+    float eco2_frac = 0.0f;
+    float tvoc_frac = 0.0f;
+
+    if (!out)
+        return false;
+
+    memset(out, 0, sizeof(*out));
+
+    if (!read_float_from_file(SGP30_ECO2_PATH, &eco2_frac))
+        return false;
+
+    if (!read_float_from_file(SGP30_TVOC_PATH, &tvoc_frac))
+        return false;
+
+    out->eco2_ppm = eco2_frac * 1000000.0f;
+    out->tvoc_ppb = tvoc_frac * 1000000000.0f;
+
+    LOGD("Read SGP30: eCO2=%.0f ppm, TVOC=%.0f ppb",
+         out->eco2_ppm,
+         out->tvoc_ppb);
 
     return true;
 }

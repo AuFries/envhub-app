@@ -10,6 +10,7 @@ add_subdirectory(src/ui)
 
 add_executable(envhub-app
   src/main.c
+  src/services/power_service.c
   src/services/sensor_service.c
 )
 
@@ -37,6 +38,7 @@ target_link_libraries(envhub-app
     lib-ui
     Threads::Threads
     drm
+    gpiod
 )
 
 install(TARGETS envhub-app DESTINATION /usr/bin)

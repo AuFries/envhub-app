@@ -39,9 +39,16 @@ typedef struct {
 } sensor_bmp580_t;
 
 typedef struct {
+    float tvoc_ppb;
+    float eco2_ppm;
+    sensor_status_t status;
+} sensor_sgp30_t;
+
+typedef struct {
     fuel_gauge_bq27441_t bq27441;
     sensor_scd30_t scd30;
     sensor_bmp580_t bmp580;
+    sensor_sgp30_t sgp30;
     // uint64_t update_ms; // timestamp instead?
 } sensor_snapshot_t;
 

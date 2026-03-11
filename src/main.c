@@ -7,11 +7,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include <inttypes.h>
+#include <syslog.h>
 
 #include <lvgl/lvgl.h>
 #include <lvgl/src/drivers/display/drm/lv_linux_drm.h>
 
 #include "services/sensor_service.h"
+#include "services/power_service.h"
 #include "ui/ui_envhub.h"
 #include "log.h"
 
@@ -43,31 +45,68 @@ static void app_sensor_timer_cb(lv_timer_t *t)
 
 int main(int argc, char **argv)
 {
-    if(lvgl_drm_init(argc, argv) != 0) {
+    if (lvgl_drm_init(argc, argv) != 0) {
         return 1;
     }
+
     openlog("envhub-app", LOG_PID | LOG_CONS, LOG_DAEMON);
+
+    if (!power_service_init()) {
+        syslog(LOG_ERR, "failed to init power service");
+        closelog();
+        return 1;
+    }
+
+    if (!power_service_start()) {
+        syslog(LOG_ERR, "failed to start power service");
+        power_service_deinit();
+        closelog();
+        return 1;
+    }
 
     sensor_service_init();
     sensor_service_start();
 
     ui_envhub_init();
-
     lv_timer_create(app_sensor_timer_cb, 1000, NULL);
 
-    while(g_run) {
+    while (g_run) {
         lv_timer_handler();
+
+        if (power_service_shutdown_requested()) {
+            syslog(LOG_INFO, "shutdown requested from power button");
+            g_run = false;
+        }
+
         usleep(5000);
     }
 
-    closelog();
-    return 0;
+    power_service_stop();
+    sensor_service_stop();
+
+    sync();
+    usleep(200000);
+
+    if (!power_service_power_cut()) {
+        syslog(LOG_ERR, "failed to assert OFF gpio");
+        power_service_deinit();
+        closelog();
+        return 1;
+    }
+
+    /*
+     * Stay alive so the GPIO line remains asserted until the MK2 removes power.
+     */
+    syslog(LOG_INFO, "waiting for hardware power cut");
+    for (;;) {
+        pause();
+    }
 }
 
 static void *tick_thread(void *arg)
 {
     (void)arg;
-    while(g_run) {
+    while (g_run) {
         lv_tick_inc(1);
         usleep(1000);
     }
@@ -76,10 +115,10 @@ static void *tick_thread(void *arg)
 
 static int64_t parse_i64(const char *s, int64_t def)
 {
-    if(!s || !*s) return def;
+    if (!s || !*s) return def;
     char *end = NULL;
     long long v = strtoll(s, &end, 0);
-    if(end == s) return def;
+    if (end == s) return def;
     return (int64_t)v;
 }
 
@@ -88,19 +127,19 @@ static int lvgl_drm_init(int argc, char **argv)
     const char *card = "/dev/dri/card0";
     int64_t connector_id = -1;
 
-    if(argc >= 2) card = argv[1];
-    if(argc >= 3) connector_id = parse_i64(argv[2], -1);
+    if (argc >= 2) card = argv[1];
+    if (argc >= 3) connector_id = parse_i64(argv[2], -1);
 
     lv_init();
 
     lv_display_t *disp = lv_linux_drm_create();
-    if(!disp) {
+    if (!disp) {
         fprintf(stderr, "ERROR: lv_linux_drm_create() returned NULL\n");
         return -1;
     }
 
     lv_result_t r = lv_linux_drm_set_file(disp, card, connector_id);
-    if(r != LV_RESULT_OK) {
+    if (r != LV_RESULT_OK) {
         fprintf(stderr, "ERROR: lv_linux_drm_set_file failed\n");
         return -1;
     }
@@ -108,7 +147,7 @@ static int lvgl_drm_init(int argc, char **argv)
     lv_display_set_default(disp);
 
     pthread_t th;
-    if(pthread_create(&th, NULL, tick_thread, NULL) != 0) {
+    if (pthread_create(&th, NULL, tick_thread, NULL) != 0) {
         fprintf(stderr, "ERROR: pthread_create failed: %s\n", strerror(errno));
         return -1;
     }
