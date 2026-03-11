@@ -1,4 +1,5 @@
 #include "status_service.h"
+#include "data_logger.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -102,10 +103,19 @@ void status_service_set_sensor_status(status_sensor_id_t sensor_id,
 
     entry = &g_sensor_status[sensor_id];
 
+    sensor_status_t old_status = entry->sensor_status;
+
     /* Only update "since_ms" when the status actually changes. */
-    if (entry->sensor_status == sensor_status)
+    if (old_status == sensor_status)
         return;
 
+    
+    data_logger_log_status_event(now_ms,
+                                sensor_id,
+                                old_status,
+                                sensor_status,
+                                entry->detail);
+                                
     entry->sensor_status = sensor_status;
     entry->severity = severity_from_sensor_status(sensor_status);
     entry->active = (sensor_status != SENSOR_STATUS_OK);

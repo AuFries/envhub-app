@@ -13,6 +13,7 @@ add_executable(envhub-app
   src/services/power_service.c
   src/services/sensor_service.c
   src/services/status_service.c
+  src/services/data_logger.c
 )
 
 target_include_directories(envhub-app

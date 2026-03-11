@@ -16,6 +16,7 @@
 #include "services/sensor_service.h"
 #include "services/power_service.h"
 #include "services/status_service.h"
+#include "services/data_logger.h"
 #include "ui/ui_envhub.h"
 #include "log.h"
 
@@ -41,6 +42,7 @@ static void app_sensor_timer_cb(lv_timer_t *t)
     if (!sensor_service_get_snapshot(&snap))
         return;
 
+
     if (snap.scd30.status == SENSOR_STATUS_OK)
     {
         ui_envhub_set_scd30(snap.scd30.co2_ppm, snap.scd30.temperature_c, snap.scd30.humidity_rh);
@@ -57,7 +59,9 @@ static void app_sensor_timer_cb(lv_timer_t *t)
     ui_envhub_set_bq27441(snap.bq27441.capacity_percent, snap.bq27441.voltage_v, snap.bq27441.current_ma);
 
     uint64_t now_ms = get_monotonic_time_ms();
-
+    
+    data_logger_log_snapshot(now_ms, &snap);
+    
     status_service_set_sensor_status(STATUS_SENSOR_BQ27441, snap.bq27441.status, now_ms);
     status_service_set_sensor_status(STATUS_SENSOR_SCD30, snap.scd30.status, now_ms);
     status_service_set_sensor_status(STATUS_SENSOR_BMP580, snap.bmp580.status, now_ms);
@@ -89,6 +93,10 @@ int main(int argc, char **argv)
         power_service_deinit();
         closelog();
         return 1;
+    }
+
+    if (!data_logger_init()) {
+        syslog(LOG_ERR, "failed to initialize data logger");
     }
 
     sensor_service_init();
