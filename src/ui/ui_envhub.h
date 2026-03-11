@@ -30,6 +30,7 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 void ui_envhub_init(void);
+void ui_envhub_show_shutdown_popup(void);
 
 void ui_envhub_set_time_text(const char *s);
 void ui_envhub_set_scd30(float co2_ppm, float temp_c, float humidity_rh);

@@ -157,7 +157,7 @@ static void bind_sensor_labels(lv_obj_t *screen)
     pressure_label = find_by_name_dfs(screen, "pressure_value");
     eco2_label = find_by_name_dfs(screen, "eco2_value");
     tvoc_label = find_by_name_dfs(screen, "tvoc_value");
-    
+
     // power_label    = find_by_name_dfs(screen, "power_value");
     // current_label  = find_by_name_dfs(screen, "current_value");
     // voltage_label  = find_by_name_dfs(screen, "voltage_value");
@@ -278,4 +278,24 @@ void ui_envhub_set_sgp30(float eco2_ppm, float tvoc_ppb) {
         snprintf(buf, sizeof(buf), "%.0f", tvoc_ppb);
         lv_label_set_text(tvoc_label, buf);
     }
+}
+
+void ui_envhub_show_shutdown_popup(void)
+{
+    lv_obj_t *scr = lv_screen_active();
+
+    lv_obj_t *overlay = lv_obj_create(scr);
+    lv_obj_remove_style_all(overlay);
+    lv_obj_set_size(overlay, LV_PCT(100), LV_PCT(100));
+    lv_obj_set_style_bg_color(overlay, lv_color_black(), 0);
+    lv_obj_set_style_bg_opa(overlay, LV_OPA_60, 0);
+    lv_obj_center(overlay);
+
+    lv_obj_t *panel = lv_obj_create(overlay);
+    lv_obj_set_size(panel, 220, 100);
+    lv_obj_center(panel);
+
+    lv_obj_t *label = lv_label_create(panel);
+    lv_label_set_text(label, "Shutting down...");
+    lv_obj_center(label);
 }

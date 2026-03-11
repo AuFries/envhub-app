@@ -18,6 +18,8 @@
 #include "log.h"
 
 static volatile bool g_run = true;
+static volatile bool g_shutdown_in_progress = false;
+static uint32_t g_shutdown_popup_started_ms = 0;
 
 static void *tick_thread(void *arg);
 static int64_t parse_i64(const char *s, int64_t def);
@@ -26,6 +28,10 @@ static int lvgl_drm_init(int argc, char **argv);
 static void app_sensor_timer_cb(lv_timer_t *t)
 {
     (void)t;
+
+    if (g_shutdown_in_progress) {
+        return;
+    }
 
     sensor_snapshot_t snap;
     if (!sensor_service_get_snapshot(&snap))
@@ -73,13 +79,28 @@ int main(int argc, char **argv)
     while (g_run) {
         lv_timer_handler();
 
-        if (power_service_shutdown_requested()) {
+        if (!g_shutdown_in_progress && power_service_shutdown_requested()) {
             syslog(LOG_INFO, "shutdown requested from power button");
-            g_run = false;
+
+            g_shutdown_in_progress = true;
+            ui_envhub_show_shutdown_popup();
+            g_shutdown_popup_started_ms = lv_tick_get();
+        }
+
+        if (g_shutdown_in_progress) {
+            /*
+             * Keep LVGL running briefly so the popup actually renders
+             * before we stop services and cut power.
+             */
+            if (lv_tick_elaps(g_shutdown_popup_started_ms) >= 750) {
+                g_run = false;
+            }
         }
 
         usleep(5000);
     }
+
+    syslog(LOG_INFO, "stopping services for shutdown");
 
     power_service_stop();
     sensor_service_stop();
