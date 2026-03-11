@@ -57,9 +57,9 @@ bool sensor_service_init(void)
     pthread_mutex_lock(&sensor_mutex);
 
     memset(&snapshot, 0, sizeof(snapshot));
-    snapshot.scd30.status = SENSOR_STATUS_UNINITIALIZED;
-    snapshot.bmp580.status = SENSOR_STATUS_UNINITIALIZED;
-    snapshot.sgp30.status = SENSOR_STATUS_UNINITIALIZED;
+    snapshot.scd30.status = SENSOR_STATUS_MISSING;
+    snapshot.bmp580.status = SENSOR_STATUS_MISSING;
+    snapshot.sgp30.status = SENSOR_STATUS_MISSING;
     
     running = false;
 

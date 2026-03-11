@@ -1,0 +1,17 @@
+
+
+
+Obtaining INA219 name at runtime:
+~ # ls /sys/class/hwmon/hwmon0/of_node/
+compatible      phandle         shunt-resistor
+name            reg
+~ # ls /sys/class/hwmon/hwmon0/of_node/name 
+/sys/class/hwmon/hwmon0/of_node/name
+~ # cat /sys/class/hwmon/hwmon0/of_node/name 
+ina219-system
+
+
+SCD30:
+CO2_ppm = in_concentration_co2_raw / 100
+Temp_C  = in_temp_input / 1000
+RH_pct  = in_humidityrelative_input / 1000

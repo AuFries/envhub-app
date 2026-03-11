@@ -31,6 +31,8 @@ add_library(${LIB_NAME} STATIC ${UI_SOURCES})
 target_include_directories(${LIB_NAME}
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
+    ${CMAKE_CURRENT_SOURCE_DIR}/../services
     ${CMAKE_CURRENT_SOURCE_DIR}/screens
     ${CMAKE_CURRENT_SOURCE_DIR}/fonts
     ${CMAKE_CURRENT_SOURCE_DIR}/widgets

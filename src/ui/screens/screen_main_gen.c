@@ -218,18 +218,20 @@ lv_obj_t * screen_main_create(void)
     lv_obj_set_y(tvoc_value, 5);
     lv_obj_add_style(tvoc_value, &value_text, 0);
     
-    lv_obj_t * lv_obj_3 = lv_obj_create(lv_obj_0);
-    lv_obj_set_width(lv_obj_3, 240);
-    lv_obj_set_height(lv_obj_3, 34);
-    lv_obj_set_align(lv_obj_3, LV_ALIGN_BOTTOM_MID);
-    lv_obj_set_x(lv_obj_3, 0);
-    lv_obj_set_y(lv_obj_3, 0);
-    lv_obj_add_style(lv_obj_3, &panel, 0);
-    lv_obj_t * lv_label_6 = lv_label_create(lv_obj_3);
-    lv_label_set_text(lv_label_6, "Status: {status message}");
-    lv_obj_set_align(lv_label_6, LV_ALIGN_LEFT_MID);
-    lv_obj_set_x(lv_label_6, 6);
-    lv_obj_add_style(lv_label_6, &label_text, 0);
+    lv_obj_t * status_bar = lv_obj_create(lv_obj_0);
+    lv_obj_set_name(status_bar, "status_bar");
+    lv_obj_set_width(status_bar, 240);
+    lv_obj_set_height(status_bar, 34);
+    lv_obj_set_align(status_bar, LV_ALIGN_BOTTOM_MID);
+    lv_obj_set_x(status_bar, 0);
+    lv_obj_set_y(status_bar, 0);
+    lv_obj_add_style(status_bar, &panel, 0);
+    lv_obj_t * status_label = lv_label_create(status_bar);
+    lv_obj_set_name(status_label, "status_label");
+    lv_label_set_text(status_label, "Status: {status message}");
+    lv_obj_set_align(status_label, LV_ALIGN_LEFT_MID);
+    lv_obj_set_x(status_label, 6);
+    lv_obj_add_style(status_label, &label_text, 0);
 
     LV_TRACE_OBJ_CREATE("finished");
 

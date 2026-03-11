@@ -13,6 +13,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "ui_envhub_gen.h"
+#include "ui_status_types.h"
 
 /*********************
  *      DEFINES
@@ -30,6 +31,8 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 void ui_envhub_init(void);
+
+void ui_envhub_set_status_summary(status_severity_t severity, const char *text);
 void ui_envhub_show_shutdown_popup(void);
 
 void ui_envhub_set_time_text(const char *s);

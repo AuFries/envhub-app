@@ -82,9 +82,9 @@
   </lv_obj>
 
     <!-- Status bar -->
-    <lv_obj width="240" height="34" align="bottom_mid" x="0" y="0">
+    <lv_obj name="status_bar" width="240" height="34" align="bottom_mid" x="0" y="0">
       <style name="panel" />
-      <lv_label text="Status: {status message}" align="left_mid" x="6">
+      <lv_label name="status_label" text="Status: {status message}" align="left_mid" x="6">
         <style name="label_text" />
       </lv_label>
     </lv_obj>

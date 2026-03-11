@@ -8,12 +8,14 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <syslog.h>
+#include <time.h>
 
 #include <lvgl/lvgl.h>
 #include <lvgl/src/drivers/display/drm/lv_linux_drm.h>
 
 #include "services/sensor_service.h"
 #include "services/power_service.h"
+#include "services/status_service.h"
 #include "ui/ui_envhub.h"
 #include "log.h"
 
@@ -24,6 +26,7 @@ static uint32_t g_shutdown_popup_started_ms = 0;
 static void *tick_thread(void *arg);
 static int64_t parse_i64(const char *s, int64_t def);
 static int lvgl_drm_init(int argc, char **argv);
+static uint64_t get_monotonic_time_ms(void);
 
 static void app_sensor_timer_cb(lv_timer_t *t)
 {
@@ -46,7 +49,18 @@ static void app_sensor_timer_cb(lv_timer_t *t)
     if (snap.sgp30.status == SENSOR_STATUS_OK) {
         ui_envhub_set_sgp30(snap.sgp30.eco2_ppm, snap.sgp30.tvoc_ppb);
     }
+
     ui_envhub_set_bq27441(snap.bq27441.capacity_percent, snap.bq27441.voltage_v, snap.bq27441.current_ma);
+
+    uint64_t now_ms = get_monotonic_time_ms();
+
+    status_service_set_sensor_status(STATUS_SENSOR_BQ27441, snap.bq27441.status, now_ms);
+    status_service_set_sensor_status(STATUS_SENSOR_SCD30,   snap.scd30.status,   now_ms);
+    status_service_set_sensor_status(STATUS_SENSOR_BMP580,  snap.bmp580.status,  now_ms);
+    status_service_set_sensor_status(STATUS_SENSOR_SGP30,   snap.sgp30.status,   now_ms);
+
+    ui_envhub_set_status_summary(status_service_get_overall_severity(),
+                             status_service_get_summary());
 }
 
 int main(int argc, char **argv)
@@ -174,4 +188,14 @@ static int lvgl_drm_init(int argc, char **argv)
     }
 
     return 0;
+}
+
+static uint64_t get_monotonic_time_ms(void)
+{
+    struct timespec ts;
+
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+
+    return ((uint64_t)ts.tv_sec * 1000ULL) +
+           ((uint64_t)ts.tv_nsec / 1000000ULL);
 }

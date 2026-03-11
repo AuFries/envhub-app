@@ -6,6 +6,10 @@
 #include <time.h>
 
 #include "ui_envhub.h"
+#include "ui_status_types.h"
+
+static lv_obj_t *status_bar = NULL;
+static lv_obj_t *status_label = NULL;
 
 static lv_obj_t *time_label = NULL;
 static lv_obj_t *battery_capacity_label = NULL;
@@ -20,7 +24,7 @@ static lv_obj_t *power_label = NULL;
 static lv_obj_t *current_label = NULL;
 static lv_obj_t *voltage_label = NULL;
 
-static void bind_sensor_labels(lv_obj_t *screen);
+static void bind_labels(lv_obj_t *screen);
 static void time_update_cb(lv_timer_t *t);
 
 static lv_obj_t *find_by_name_dfs(lv_obj_t *root, const char *target)
@@ -136,7 +140,7 @@ void ui_envhub_init(void)
 
     time_label = find_by_name_dfs(screen, "time");
 
-    bind_sensor_labels(screen);
+    bind_labels(screen);
 
     ui_envhub_set_time_text(NULL);
     lv_timer_create(time_update_cb, 60000, NULL);
@@ -145,10 +149,13 @@ void ui_envhub_init(void)
     lv_timer_create(apply_grid_cb, 1, NULL);
 }
 
-static void bind_sensor_labels(lv_obj_t *screen)
+static void bind_labels(lv_obj_t *screen)
 {
     if (!screen)
         return;
+
+    status_bar = find_by_name_dfs(screen, "status_bar");
+    status_label = find_by_name_dfs(screen, "status_label");
 
     battery_capacity_label = find_by_name_dfs(screen, "battery_capacity");
     co2_label = find_by_name_dfs(screen, "co2_value");
@@ -298,4 +305,45 @@ void ui_envhub_show_shutdown_popup(void)
     lv_obj_t *label = lv_label_create(panel);
     lv_label_set_text(label, "Shutting down...");
     lv_obj_center(label);
+}
+
+void ui_envhub_set_status_summary(status_severity_t severity, const char *text)
+{
+    lv_color_t bg_color;
+    lv_color_t text_color;
+
+    if (!text)
+        text = "OK";
+
+    if (status_label) {
+        lv_label_set_text(status_label, text);
+    }
+
+    switch (severity) {
+    case STATUS_SEV_CRITICAL:
+        bg_color = lv_palette_main(LV_PALETTE_RED);
+        text_color = lv_color_white();
+        break;
+
+    case STATUS_SEV_WARNING:
+        bg_color = lv_palette_main(LV_PALETTE_ORANGE);
+        text_color = lv_color_black();
+        break;
+
+    case STATUS_SEV_INFO:
+    default:
+        bg_color = lv_palette_main(LV_PALETTE_BLUE_GREY);
+        text_color = lv_color_white();
+        break;
+    }
+
+    if (status_bar) {
+        lv_obj_set_style_bg_color(status_bar, bg_color, LV_PART_MAIN);
+        lv_obj_set_style_bg_opa(status_bar, LV_OPA_COVER, LV_PART_MAIN);
+        lv_obj_set_style_border_width(status_bar, 0, LV_PART_MAIN);
+    }
+
+    if (status_label) {
+        lv_obj_set_style_text_color(status_label, text_color, LV_PART_MAIN);
+    }
 }
