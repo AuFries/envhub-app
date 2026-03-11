@@ -228,8 +228,8 @@ lv_obj_t * screen_main_create(void)
     lv_obj_add_style(status_bar, &panel, 0);
     lv_obj_t * status_label = lv_label_create(status_bar);
     lv_obj_set_name(status_label, "status_label");
-    lv_label_set_text(status_label, "Status: {status message}");
-    lv_obj_set_align(status_label, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(status_label, "Status");
+    lv_obj_set_align(status_label, LV_ALIGN_CENTER);
     lv_obj_set_x(status_label, 6);
     lv_obj_add_style(status_label, &label_text, 0);
 
