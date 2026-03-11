@@ -13,6 +13,8 @@ static lv_obj_t *co2_label = NULL;
 static lv_obj_t *temp_label = NULL;
 static lv_obj_t *humidity_label = NULL;
 static lv_obj_t *pressure_label = NULL;
+static lv_obj_t *eco2_label = NULL;
+static lv_obj_t *tvoc_label = NULL;
 
 static lv_obj_t *power_label = NULL;
 static lv_obj_t *current_label = NULL;
@@ -153,7 +155,9 @@ static void bind_sensor_labels(lv_obj_t *screen)
     temp_label = find_by_name_dfs(screen, "temp_value");
     humidity_label = find_by_name_dfs(screen, "humidity_value");
     pressure_label = find_by_name_dfs(screen, "pressure_value");
-
+    eco2_label = find_by_name_dfs(screen, "eco2_value");
+    tvoc_label = find_by_name_dfs(screen, "tvoc_value");
+    
     // power_label    = find_by_name_dfs(screen, "power_value");
     // current_label  = find_by_name_dfs(screen, "current_value");
     // voltage_label  = find_by_name_dfs(screen, "voltage_value");
@@ -257,5 +261,21 @@ void ui_envhub_set_bmp580(float pressure_hpa, float temperature_c) {
     {
         snprintf(buf, sizeof(buf), "%.1f", pressure_hpa);
         lv_label_set_text(pressure_label, buf);
+    }
+}
+
+void ui_envhub_set_sgp30(float eco2_ppm, float tvoc_ppb) {
+    char buf[32];
+
+    if (eco2_label)
+    {
+        snprintf(buf, sizeof(buf), "%.0f", eco2_ppm);
+        lv_label_set_text(eco2_label, buf);
+    }
+
+    if (tvoc_label)
+    {
+        snprintf(buf, sizeof(buf), "%.0f", tvoc_ppb);
+        lv_label_set_text(tvoc_label, buf);
     }
 }

@@ -70,14 +70,14 @@
     <lv_obj name="tile_eco2" width="108" height="70">
       <style name="panel" />
       <lv_label text="eCO2 (ppm)" align="top_mid" y="-12"><style name="label_text" /></lv_label>
-      <lv_label text="0" align="center" x="0" y="5"><style name="value_text" /></lv_label>
+      <lv_label name="eco2_value" text="0" align="center" x="0" y="5"><style name="value_text" /></lv_label>
     </lv_obj>
 
       <!-- TVOC -->
     <lv_obj name="tile_tvoc" width="108" height="70">
       <style name="panel" />
       <lv_label text="TVOC (ppb)" align="top_mid" x="0" y="-12"><style name="label_text" /></lv_label>
-      <lv_label text="0" align="center" x="0" y="5"><style name="value_text" /></lv_label>
+      <lv_label name="tvoc_value" text="0" align="center" x="0" y="5"><style name="value_text" /></lv_label>
     </lv_obj>
   </lv_obj>
 
