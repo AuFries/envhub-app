@@ -61,7 +61,7 @@ static void app_sensor_timer_cb(lv_timer_t *t)
     uint64_t now_ms = get_monotonic_time_ms();
     
     data_logger_log_snapshot(now_ms, &snap);
-    
+
     status_service_set_sensor_status(STATUS_SENSOR_BQ27441, snap.bq27441.status, now_ms);
     status_service_set_sensor_status(STATUS_SENSOR_SCD30, snap.scd30.status, now_ms);
     status_service_set_sensor_status(STATUS_SENSOR_BMP580, snap.bmp580.status, now_ms);
@@ -120,10 +120,6 @@ int main(int argc, char **argv)
 
         if (g_shutdown_in_progress)
         {
-            /*
-             * Keep LVGL running briefly so the popup actually renders
-             * before we stop services and cut power.
-             */
             if (lv_tick_elaps(g_shutdown_popup_started_ms) >= 750)
             {
                 g_run = false;
