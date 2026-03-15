@@ -34,9 +34,9 @@ add_subdirectory(src/ui)
 
 add_executable(envhub-app
   src/main.c
-  src/services/power_service.c
-  src/services/sensor_service.c
-  src/services/status_service.c
+  src/power_ctrl.c
+  src/sensors.c
+  src/status.c
   src/services/data_logger.c
 )
 
