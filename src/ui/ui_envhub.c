@@ -6,7 +6,6 @@
 #include <time.h>
 
 #include "ui_envhub.h"
-#include "ui_status_types.h"
 
 static lv_obj_t *status_bar = NULL;
 static lv_obj_t *status_label = NULL;
@@ -221,68 +220,65 @@ void ui_envhub_set_time_text(const char *s)
     lv_label_set_text(time_label, buf);
 }
 
-void ui_envhub_set_bq27441(uint8_t capacity_percent, float voltage_v, float current_ma)
+void ui_envhub_set_bq27441(const ui_bq27441_data_t *bq27441)
 {
     char buf[32];
 
-    (void)voltage_v;
-    (void)current_ma;
-
     if (battery_capacity_label)
     {
-        snprintf(buf, sizeof(buf), "%u%%", capacity_percent);
+        snprintf(buf, sizeof(buf), "%u%%", bq27441->capacity_percent);
         lv_label_set_text(battery_capacity_label, buf);
     }
 }
 
-void ui_envhub_set_scd30(float co2_ppm, float temp_c, float humidity_rh)
+void ui_envhub_set_scd30(const ui_scd30_data_t *scd30)
 {
     char buf[32];
 
     if (co2_label)
     {
-        snprintf(buf, sizeof(buf), "%.0f", co2_ppm);
+        snprintf(buf, sizeof(buf), "%.0f", scd30->co2_ppm);
         lv_label_set_text(co2_label, buf);
     }
 
     if (temp_label)
     {
-        snprintf(buf, sizeof(buf), "%.1f", temp_c);
+        snprintf(buf, sizeof(buf), "%.1f", scd30->temperature_c);
         lv_label_set_text(temp_label, buf);
     }
 
     if (humidity_label)
     {
-        snprintf(buf, sizeof(buf), "%.1f", humidity_rh);
+        snprintf(buf, sizeof(buf), "%.1f", scd30->humidity_rh);
         lv_label_set_text(humidity_label, buf);
     }
 }
 
-void ui_envhub_set_bmp580(float pressure_hpa, float temperature_c)
+void ui_envhub_set_bmp580(const ui_bmp580_data_t *bmp580)
 {
 
     char buf[32];
 
     if (pressure_label)
     {
-        snprintf(buf, sizeof(buf), "%.1f", pressure_hpa);
+        snprintf(buf, sizeof(buf), "%.1f", bmp580->pressure_hpa);
         lv_label_set_text(pressure_label, buf);
     }
 }
 
-void ui_envhub_set_sgp30(float eco2_ppm, float tvoc_ppb)
+void ui_envhub_set_sgp30(const ui_sgp30_data_t *sgp30)
 {
     char buf[32];
 
     if (eco2_label)
     {
-        snprintf(buf, sizeof(buf), "%.0f", eco2_ppm);
+        snprintf(buf, sizeof(buf), "%.0f", sgp30->eco2_ppm);
         lv_label_set_text(eco2_label, buf);
     }
 
     if (tvoc_label)
     {
-        snprintf(buf, sizeof(buf), "%.0f", tvoc_ppb);
+        snprintf(buf, sizeof(buf), "%.0f", sgp30->tvoc_ppb);
         lv_label_set_text(tvoc_label, buf);
     }
 }

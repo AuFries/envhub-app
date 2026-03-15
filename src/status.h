@@ -6,7 +6,13 @@
 #include <stdint.h>
 
 #include "sensor_service.h"
-#include "ui_status_types.h"
+
+typedef enum
+{
+    STATUS_SEV_INFO = 0,
+    STATUS_SEV_WARNING,
+    STATUS_SEV_CRITICAL,
+} status_severity_t;
 
 typedef enum
 {

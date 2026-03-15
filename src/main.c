@@ -42,21 +42,42 @@ static void app_sensor_timer_cb(lv_timer_t *t)
     if (!sensor_service_get_snapshot(&snap))
         return;
 
+    ui_scd30_data_t ui_scd30 = {
+        .co2_ppm = snap.scd30.co2_ppm,
+        .temperature_c = snap.scd30.temperature_c,
+        .humidity_rh = snap.scd30.humidity_rh,
+    };
+
+    ui_bmp580_data_t ui_bmp580 = {
+        .temperature_c = snap.bmp580.temperature_c,
+        .pressure_hpa = snap.bmp580.pressure_hpa,
+    };
+
+    ui_sgp30_data_t ui_sgp30 = {
+        .tvoc_ppb = snap.sgp30.tvoc_ppb,
+        .eco2_ppm = snap.sgp30.eco2_ppm,
+    };
+
+    ui_bq27441_data_t ui_bq27441 = {
+        .capacity_percent = snap.bq27441.capacity_percent,
+        .voltage_v = snap.bq27441.voltage_v,
+        .current_ma = snap.bq27441.current_ma,
+    };
+
     if (snap.scd30.status == SENSOR_STATUS_OK)
     {
-        ui_envhub_set_scd30(snap.scd30.co2_ppm, snap.scd30.temperature_c, snap.scd30.humidity_rh);
+        ui_envhub_set_scd30(&ui_scd30);
     }
     if (snap.bmp580.status == SENSOR_STATUS_OK)
     {
-        ui_envhub_set_bmp580(snap.bmp580.pressure_hpa, snap.bmp580.temperature_c);
+        ui_envhub_set_bmp580(&ui_bmp580);
     }
     if (snap.sgp30.status == SENSOR_STATUS_OK)
     {
-        ui_envhub_set_sgp30(snap.sgp30.eco2_ppm, snap.sgp30.tvoc_ppb);
+        ui_envhub_set_sgp30(&ui_sgp30);
     }
 
-    ui_envhub_set_bq27441(snap.bq27441.capacity_percent, snap.bq27441.voltage_v,
-                          snap.bq27441.current_ma);
+    ui_envhub_set_bq27441(&ui_bq27441);
 
     uint64_t now_ms = get_monotonic_time_ms();
 

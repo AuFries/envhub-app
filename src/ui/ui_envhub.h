@@ -6,53 +6,84 @@
 #define UI_ENVHUB_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /*********************
  *      INCLUDES
  *********************/
+#include <stdint.h>
+
 #include "ui_envhub_gen.h"
-#include "ui_status_types.h"
 
-/*********************
- *      DEFINES
- *********************/
+    /*********************
+     *      DEFINES
+     *********************/
 
-/**********************
- *      TYPEDEFS
- **********************/
+    /**********************
+     *      TYPEDEFS
+     **********************/
 
-/**********************
- * GLOBAL VARIABLES
- **********************/
+    typedef enum
+    {
+        STATUS_SEV_INFO = 0,
+        STATUS_SEV_WARNING,
+        STATUS_SEV_CRITICAL,
+    } status_severity_t;
 
-/**********************
- * GLOBAL PROTOTYPES
- **********************/
-void ui_envhub_init(void);
+    typedef struct
+    {
+        float co2_ppm;
+        float temperature_c;
+        float humidity_rh;
+    } ui_scd30_data_t;
 
-void ui_envhub_set_status_summary(status_severity_t severity, const char *text);
-void ui_envhub_show_shutdown_popup(void);
+    typedef struct
+    {
+        uint8_t capacity_percent;
+        float voltage_v;
+        float current_ma;
+    } ui_bq27441_data_t;
 
-void ui_envhub_set_time_text(const char *s);
-void ui_envhub_set_scd30(float co2_ppm, float temp_c, float humidity_rh);
-void ui_envhub_set_bmp580(float pressure_hpa, float temperature_c);
-void ui_envhub_set_sgp30(float eco2_ppm, float tvoc_ppb);
-void ui_envhub_set_bq27441(uint8_t capacity_percent,float voltage_v,float current_ma);
+    typedef struct
+    {
+        float temperature_c;
+        float pressure_hpa;
+    } ui_bmp580_data_t;
 
+    typedef struct
+    {
+        float tvoc_ppb;
+        float eco2_ppm;
+    } ui_sgp30_data_t;
 
-/**
- * Initialize the component library
- */
-void ui_envhub_init(void);
+    /**********************
+     * GLOBAL VARIABLES
+     **********************/
 
-/**********************
- *      MACROS
- **********************/
+    /**********************
+     * GLOBAL PROTOTYPES
+     **********************/
+
+    void ui_envhub_init(void);
+
+    void ui_envhub_set_status_summary(status_severity_t severity, const char *text);
+    void ui_envhub_show_shutdown_popup(void);
+
+    void ui_envhub_set_time_text(const char *s);
+
+    void ui_envhub_set_scd30(const ui_scd30_data_t *scd30);
+    void ui_envhub_set_bq27441(const ui_bq27441_data_t *bq27441);
+    void ui_envhub_set_bmp580(const ui_bmp580_data_t *bmp580);
+    void ui_envhub_set_sgp30(const ui_sgp30_data_t *sgp30);
+
+    /**********************
+     *      MACROS
+     **********************/
 
 #ifdef __cplusplus
-} /*extern "C"*/
+} /* extern "C" */
 #endif
 
-#endif /*UI_ENVHUB_H*/
+#endif /* UI_ENVHUB_H */

@@ -37,7 +37,7 @@ add_executable(envhub-app
   src/power_ctrl.c
   src/sensors.c
   src/status.c
-  src/services/data_logger.c
+  src/data_logger.c
 )
 
 target_include_directories(envhub-app
