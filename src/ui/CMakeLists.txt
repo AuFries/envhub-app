@@ -59,6 +59,7 @@ if(EXISTS "${CMAKE_SYSROOT}/usr/include/lvgl/lv_conf.h")
 
   target_compile_definitions(${LIB_NAME}
     PRIVATE
+      _DEFAULT_SOURCE
       LV_CONF_PATH="${CMAKE_SYSROOT}/usr/include/lvgl/lv_conf.h"
   )
 

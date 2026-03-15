@@ -1,5 +1,5 @@
-#ifndef POWER_SERVICE_H
-#define POWER_SERVICE_H
+#ifndef POWER_CTRL_H
+#define POWER_CTRL_H
 
 #include <stdbool.h>
 

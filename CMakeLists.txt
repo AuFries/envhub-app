@@ -38,6 +38,7 @@ add_executable(envhub-app
   src/sensors.c
   src/status.c
   src/data_logger.c
+  src/touch_input.c
 )
 
 target_include_directories(envhub-app
@@ -55,6 +56,7 @@ if(EXISTS "${CMAKE_SYSROOT}/usr/include/lvgl/lv_conf.h")
 
   target_compile_definitions(envhub-app
     PRIVATE
+      _DEFAULT_SOURCE
       LV_CONF_PATH="${CMAKE_SYSROOT}/usr/include/lvgl/lv_conf.h"
   )
 endif()

@@ -1,4 +1,4 @@
-#include "power_service.h"
+#include "power_ctrl.h"
 
 #include <errno.h>
 #include <fcntl.h>

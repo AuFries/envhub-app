@@ -1,5 +1,5 @@
-#ifndef SENSOR_SERVICE_H
-#define SENSOR_SERVICE_H
+#ifndef SENSORS_H
+#define SENSORS_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -68,4 +68,4 @@ bool sensor_service_start(void);
 void sensor_service_stop(void);
 bool sensor_service_get_snapshot(sensor_snapshot_t *out);
 
-#endif /* SENSOR_SERVICE_H */
+#endif /* SENSORS_H */

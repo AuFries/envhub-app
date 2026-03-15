@@ -27,10 +27,10 @@ extern "C"
 
     typedef enum
     {
-        STATUS_SEV_INFO = 0,
-        STATUS_SEV_WARNING,
-        STATUS_SEV_CRITICAL,
-    } status_severity_t;
+        UI_STATUS_SEV_INFO = 0,
+        UI_STATUS_SEV_WARNING,
+        UI_STATUS_SEV_CRITICAL,
+    } ui_status_severity_t;
 
     typedef struct
     {
@@ -68,7 +68,7 @@ extern "C"
 
     void ui_envhub_init(void);
 
-    void ui_envhub_set_status_summary(status_severity_t severity, const char *text);
+    void ui_envhub_set_status_summary(ui_status_severity_t severity, const char *text);
     void ui_envhub_show_shutdown_popup(void);
 
     void ui_envhub_set_time_text(const char *s);

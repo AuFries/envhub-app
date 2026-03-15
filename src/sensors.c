@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include <time.h>
 
-#include "sensor_service.h"
+#include "sensors.h"
 #include "log.h"
 
 #define UPDATE_INTERVAL_SECONDS 2

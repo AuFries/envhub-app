@@ -22,14 +22,14 @@
     <style name="style_main" />
 
     <!-- Top row -->
-    <lv_obj width="160" height="40" align="top_left" x="2" y="0">
+    <lv_obj name="time_panel" width="160" height="40" align="top_left" x="2" y="0">
       <style name="panel" />
       <lv_label name="time" text="Jan 1 00:00" align="center">
         <style name="value_text" />
       </lv_label>
     </lv_obj>
 
-    <lv_obj width="80" height="40" align="top_right" x="-2" y="0">
+    <lv_obj name="battery_panel" width="80" height="40" align="top_right" x="-2" y="0">
       <style name="panel" />
       <lv_label name="battery_capacity" text="0%" align="center">
         <style name="value_text" />

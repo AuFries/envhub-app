@@ -19,12 +19,16 @@ static lv_obj_t *pressure_label = NULL;
 static lv_obj_t *eco2_label = NULL;
 static lv_obj_t *tvoc_label = NULL;
 
-static lv_obj_t *power_label = NULL;
-static lv_obj_t *current_label = NULL;
-static lv_obj_t *voltage_label = NULL;
+// static lv_obj_t *power_label = NULL;
+// static lv_obj_t *current_label = NULL;
+// static lv_obj_t *voltage_label = NULL;
+
+static lv_obj_t *time_panel = NULL;
+static lv_obj_t *battery_panel = NULL;
 
 static void bind_labels(lv_obj_t *screen);
 static void time_update_cb(lv_timer_t *t);
+static void top_panel_event_cb(lv_event_t *e);
 
 static lv_obj_t *find_by_name_dfs(lv_obj_t *root, const char *target)
 {
@@ -135,9 +139,19 @@ void ui_envhub_init(void)
     lv_obj_t *screen = screen_main_create();
     lv_screen_load(screen);
 
-    time_label = find_by_name_dfs(screen, "time");
-
     bind_labels(screen);
+
+    if (time_panel)
+    {
+        lv_obj_add_flag(time_panel, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_add_event_cb(time_panel, top_panel_event_cb, LV_EVENT_CLICKED, NULL);
+    }
+
+    if (battery_panel)
+    {
+        lv_obj_add_flag(battery_panel, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_add_event_cb(battery_panel, top_panel_event_cb, LV_EVENT_CLICKED, NULL);
+    }
 
     ui_envhub_set_time_text(NULL);
     lv_timer_create(time_update_cb, 60000, NULL);
@@ -151,6 +165,8 @@ static void bind_labels(lv_obj_t *screen)
     if (!screen)
         return;
 
+    time_label = find_by_name_dfs(screen, "time");
+
     status_bar = find_by_name_dfs(screen, "status_bar");
     status_label = find_by_name_dfs(screen, "status_label");
 
@@ -161,6 +177,9 @@ static void bind_labels(lv_obj_t *screen)
     pressure_label = find_by_name_dfs(screen, "pressure_value");
     eco2_label = find_by_name_dfs(screen, "eco2_value");
     tvoc_label = find_by_name_dfs(screen, "tvoc_value");
+
+    time_panel = find_by_name_dfs(screen, "time_panel");
+    battery_panel = find_by_name_dfs(screen, "battery_panel");
 
     // power_label    = find_by_name_dfs(screen, "power_value");
     // current_label  = find_by_name_dfs(screen, "current_value");
@@ -303,7 +322,7 @@ void ui_envhub_show_shutdown_popup(void)
     lv_obj_center(label);
 }
 
-void ui_envhub_set_status_summary(status_severity_t severity, const char *text)
+void ui_envhub_set_status_summary(ui_status_severity_t severity, const char *text)
 {
     lv_color_t bg_color;
     lv_color_t text_color;
@@ -318,17 +337,17 @@ void ui_envhub_set_status_summary(status_severity_t severity, const char *text)
 
     switch (severity)
     {
-        case STATUS_SEV_CRITICAL:
+        case UI_STATUS_SEV_CRITICAL:
             bg_color = lv_palette_main(LV_PALETTE_RED);
             text_color = lv_color_white();
             break;
 
-        case STATUS_SEV_WARNING:
+        case UI_STATUS_SEV_WARNING:
             bg_color = lv_palette_main(LV_PALETTE_ORANGE);
             text_color = lv_color_black();
             break;
 
-        case STATUS_SEV_INFO:
+        case UI_STATUS_SEV_INFO:
         default:
             bg_color = lv_palette_main(LV_PALETTE_BLUE_GREY);
             text_color = lv_color_white();
@@ -345,5 +364,21 @@ void ui_envhub_set_status_summary(status_severity_t severity, const char *text)
     if (status_label)
     {
         lv_obj_set_style_text_color(status_label, text_color, LV_PART_MAIN);
+    }
+}
+
+#include <syslog.h>
+static void top_panel_event_cb(lv_event_t *e)
+{
+    if (lv_event_get_code(e) != LV_EVENT_CLICKED)
+    {
+        return;
+    }
+
+    lv_obj_t *screen2 = screen_secondary_create();
+    if (screen2)
+    {
+        syslog(LOG_DEBUG, "Switching to secondary screen");
+        lv_screen_load(screen2);
     }
 }

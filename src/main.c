@@ -13,12 +13,13 @@
 #include <lvgl/lvgl.h>
 #include <lvgl/src/drivers/display/drm/lv_linux_drm.h>
 
-#include "services/sensor_service.h"
-#include "services/power_service.h"
-#include "services/status_service.h"
-#include "services/data_logger.h"
+#include "sensors.h"
+#include "power_ctrl.h"
+#include "status.h"
+#include "data_logger.h"
 #include "ui/ui_envhub.h"
 #include "log.h"
+#include "touch_input.h"
 
 static volatile bool g_run = true;
 static volatile bool g_shutdown_in_progress = false;
@@ -28,6 +29,7 @@ static void *tick_thread(void *arg);
 static int64_t parse_i64(const char *s, int64_t def);
 static int lvgl_drm_init(int argc, char **argv);
 static uint64_t get_monotonic_time_ms(void);
+static void lvgl_touch_read_cb(lv_indev_t *indev, lv_indev_data_t *data);
 
 static void app_sensor_timer_cb(lv_timer_t *t)
 {
@@ -127,13 +129,24 @@ int main(int argc, char **argv)
     ui_envhub_init();
     lv_timer_create(app_sensor_timer_cb, 1000, NULL);
 
+    if (!touch_input_init("/dev/input/event2", 320, 240))
+    {
+        LOGW("touch input init failed");
+    }
+    else
+    {
+        lv_indev_t *touch_indev = lv_indev_create();
+        lv_indev_set_type(touch_indev, LV_INDEV_TYPE_POINTER);
+        lv_indev_set_read_cb(touch_indev, lvgl_touch_read_cb);
+    }
+
     while (g_run)
     {
         lv_timer_handler();
 
         if (!g_shutdown_in_progress && power_service_shutdown_requested())
         {
-            syslog(LOG_INFO, "shutdown requested from power button");
+            LOGI("shutdown requested from power button");
 
             g_shutdown_in_progress = true;
             ui_envhub_show_shutdown_popup();
@@ -155,6 +168,7 @@ int main(int argc, char **argv)
 
     power_service_stop();
     sensor_service_stop();
+    touch_input_deinit();
 
     sync();
     usleep(200000);
@@ -244,4 +258,31 @@ static uint64_t get_monotonic_time_ms(void)
     clock_gettime(CLOCK_MONOTONIC, &ts);
 
     return ((uint64_t)ts.tv_sec * 1000ULL) + ((uint64_t)ts.tv_nsec / 1000000ULL);
+}
+
+static void lvgl_touch_read_cb(lv_indev_t *indev, lv_indev_data_t *data)
+{
+    (void)indev;
+
+    bool pressed = false;
+    int x = 0;
+    int y = 0;
+
+    if (!touch_input_get_state(&pressed, &x, &y))
+    {
+        data->state = LV_INDEV_STATE_RELEASED;
+        data->point.x = 0;
+        data->point.y = 0;
+        return;
+    }
+
+    // TODO: REMOVE THIS LOGGING
+    if (pressed)
+    {
+        LOGD("touch x=%d y=%d", x, y);
+    }
+
+    data->state = pressed ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+    data->point.x = x;
+    data->point.y = y;
 }

@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "sensor_service.h"
-#include "status_service.h"
+#include "sensors.h"
+#include "status.h"
 
 bool data_logger_init(void);
 void data_logger_shutdown(void);

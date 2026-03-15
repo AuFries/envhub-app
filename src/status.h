@@ -1,11 +1,11 @@
-#ifndef STATUS_SERVICE_H
-#define STATUS_SERVICE_H
+#ifndef STATUS_H
+#define STATUS_H
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
-#include "sensor_service.h"
+#include "sensors.h"
 
 typedef enum
 {
@@ -49,4 +49,4 @@ const char *status_service_get_summary(void);
 
 const char *status_service_sensor_name(status_sensor_id_t sensor_id);
 
-#endif /* STATUS_SERVICE_H */
+#endif /* STATUS_H */
