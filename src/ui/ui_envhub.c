@@ -100,9 +100,7 @@ static void apply_tiles_grid(lv_obj_t *wrap)
         uint32_t col = i % 2;
         uint32_t row = i / 2;
 
-        lv_obj_set_grid_cell(tile,
-                             LV_GRID_ALIGN_STRETCH, col, 1,
-                             LV_GRID_ALIGN_STRETCH, row, 1);
+        lv_obj_set_grid_cell(tile, LV_GRID_ALIGN_STRETCH, col, 1, LV_GRID_ALIGN_STRETCH, row, 1);
     }
 
     lv_obj_update_layout(wrap);
@@ -223,7 +221,7 @@ void ui_envhub_set_time_text(const char *s)
     lv_label_set_text(time_label, buf);
 }
 
-void ui_envhub_set_bq27441(uint8_t capacity_percent,float voltage_v,float current_ma)
+void ui_envhub_set_bq27441(uint8_t capacity_percent, float voltage_v, float current_ma)
 {
     char buf[32];
 
@@ -260,7 +258,8 @@ void ui_envhub_set_scd30(float co2_ppm, float temp_c, float humidity_rh)
     }
 }
 
-void ui_envhub_set_bmp580(float pressure_hpa, float temperature_c) {
+void ui_envhub_set_bmp580(float pressure_hpa, float temperature_c)
+{
 
     char buf[32];
 
@@ -271,7 +270,8 @@ void ui_envhub_set_bmp580(float pressure_hpa, float temperature_c) {
     }
 }
 
-void ui_envhub_set_sgp30(float eco2_ppm, float tvoc_ppb) {
+void ui_envhub_set_sgp30(float eco2_ppm, float tvoc_ppb)
+{
     char buf[32];
 
     if (eco2_label)
@@ -315,35 +315,39 @@ void ui_envhub_set_status_summary(status_severity_t severity, const char *text)
     if (!text)
         text = "OK";
 
-    if (status_label) {
+    if (status_label)
+    {
         lv_label_set_text(status_label, text);
     }
 
-    switch (severity) {
-    case STATUS_SEV_CRITICAL:
-        bg_color = lv_palette_main(LV_PALETTE_RED);
-        text_color = lv_color_white();
-        break;
+    switch (severity)
+    {
+        case STATUS_SEV_CRITICAL:
+            bg_color = lv_palette_main(LV_PALETTE_RED);
+            text_color = lv_color_white();
+            break;
 
-    case STATUS_SEV_WARNING:
-        bg_color = lv_palette_main(LV_PALETTE_ORANGE);
-        text_color = lv_color_black();
-        break;
+        case STATUS_SEV_WARNING:
+            bg_color = lv_palette_main(LV_PALETTE_ORANGE);
+            text_color = lv_color_black();
+            break;
 
-    case STATUS_SEV_INFO:
-    default:
-        bg_color = lv_palette_main(LV_PALETTE_BLUE_GREY);
-        text_color = lv_color_white();
-        break;
+        case STATUS_SEV_INFO:
+        default:
+            bg_color = lv_palette_main(LV_PALETTE_BLUE_GREY);
+            text_color = lv_color_white();
+            break;
     }
 
-    if (status_bar) {
+    if (status_bar)
+    {
         lv_obj_set_style_bg_color(status_bar, bg_color, LV_PART_MAIN);
         lv_obj_set_style_bg_opa(status_bar, LV_OPA_COVER, LV_PART_MAIN);
         lv_obj_set_style_border_width(status_bar, 0, LV_PART_MAIN);
     }
 
-    if (status_label) {
+    if (status_label)
+    {
         lv_obj_set_style_text_color(status_label, text_color, LV_PART_MAIN);
     }
 }

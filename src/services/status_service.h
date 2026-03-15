@@ -30,15 +30,12 @@ typedef struct
 
 void status_service_init(void);
 
-void status_service_set_sensor_status(status_sensor_id_t sensor_id,
-                                      sensor_status_t sensor_status,
+void status_service_set_sensor_status(status_sensor_id_t sensor_id, sensor_status_t sensor_status,
                                       uint64_t now_ms);
 
-bool status_service_get_sensor_status(status_sensor_id_t sensor_id,
-                                      sensor_status_entry_t *out);
+bool status_service_get_sensor_status(status_sensor_id_t sensor_id, sensor_status_entry_t *out);
 
-size_t status_service_get_active_sensor_statuses(sensor_status_entry_t *out,
-                                                 size_t max_entries);
+size_t status_service_get_active_sensor_statuses(sensor_status_entry_t *out, size_t max_entries);
 
 size_t status_service_get_active_count(void);
 status_severity_t status_service_get_overall_severity(void);

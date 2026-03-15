@@ -13,23 +13,23 @@
 #include "log.h"
 
 #define UPDATE_INTERVAL_SECONDS 2
-#define STALE_TIMEOUT_MS       10000ULL
+#define STALE_TIMEOUT_MS 10000ULL
 
 #define BQ27441_BASE "/sys/class/power_supply/bq27441-0"
-#define BQ27441_STATUS_PATH   BQ27441_BASE "/status"
+#define BQ27441_STATUS_PATH BQ27441_BASE "/status"
 #define BQ27441_CAPACITY_PATH BQ27441_BASE "/capacity"
-#define BQ27441_VOLTAGE_PATH  BQ27441_BASE "/voltage_now"
-#define BQ27441_CURRENT_PATH  BQ27441_BASE "/current_now"
+#define BQ27441_VOLTAGE_PATH BQ27441_BASE "/voltage_now"
+#define BQ27441_CURRENT_PATH BQ27441_BASE "/current_now"
 
 /* TODO: these are likely variable and should be auto-detected */
 #define SCD30_BASE "/sys/bus/iio/devices/iio:device2"
-#define SCD30_CO2_RAW_PATH   SCD30_BASE "/in_concentration_co2_raw"
-#define SCD30_TEMP_PATH      SCD30_BASE "/in_temp_input"
-#define SCD30_HUMID_PATH     SCD30_BASE "/in_humidityrelative_input"
+#define SCD30_CO2_RAW_PATH SCD30_BASE "/in_concentration_co2_raw"
+#define SCD30_TEMP_PATH SCD30_BASE "/in_temp_input"
+#define SCD30_HUMID_PATH SCD30_BASE "/in_humidityrelative_input"
 
 #define BMP580_BASE "/sys/bus/iio/devices/iio:device0"
 #define BMP580_PRESSURE_PATH BMP580_BASE "/in_pressure_input"
-#define BMP580_TEMP_PATH     BMP580_BASE "/in_temp_input"
+#define BMP580_TEMP_PATH BMP580_BASE "/in_temp_input"
 
 #define SGP30_BASE "/sys/bus/iio/devices/iio:device1"
 #define SGP30_ECO2_PATH SGP30_BASE "/in_concentration_co2_input"
@@ -61,8 +61,7 @@ static bool path_exists(const char *path);
 
 static uint64_t get_monotonic_time_ms(void);
 
-static sensor_status_t derive_sensor_status(read_result_t rr,
-                                            uint64_t now_ms,
+static sensor_status_t derive_sensor_status(read_result_t rr, uint64_t now_ms,
                                             uint64_t last_update_ms);
 
 bool sensor_service_init(void)
@@ -89,7 +88,8 @@ bool sensor_service_start(void)
 
     pthread_mutex_lock(&sensor_mutex);
 
-    if (running) {
+    if (running)
+    {
         pthread_mutex_unlock(&sensor_mutex);
         return true;
     }
@@ -99,7 +99,8 @@ bool sensor_service_start(void)
     pthread_mutex_unlock(&sensor_mutex);
 
     ret = pthread_create(&sensor_thread, NULL, sensor_thread_main, NULL);
-    if (ret != 0) {
+    if (ret != 0)
+    {
         pthread_mutex_lock(&sensor_mutex);
         running = false;
 
@@ -118,7 +119,8 @@ bool sensor_service_start(void)
 void sensor_service_stop(void)
 {
     pthread_mutex_lock(&sensor_mutex);
-    if (!running) {
+    if (!running)
+    {
         pthread_mutex_unlock(&sensor_mutex);
         return;
     }
@@ -144,7 +146,8 @@ static void *sensor_thread_main(void *arg)
 {
     (void)arg;
 
-    while (1) {
+    while (1)
+    {
         sensor_snapshot_t next;
         sensor_snapshot_t prev;
         bool keep_running;
@@ -167,7 +170,8 @@ static void *sensor_thread_main(void *arg)
             fuel_gauge_bq27441_t sample = prev.bq27441;
             read_result_t rr = read_bq27441(&sample);
 
-            if (rr == READ_RESULT_OK) {
+            if (rr == READ_RESULT_OK)
+            {
                 sample.last_update_ms = now_ms;
             }
 
@@ -179,7 +183,8 @@ static void *sensor_thread_main(void *arg)
             sensor_scd30_t sample = prev.scd30;
             read_result_t rr = read_scd30(&sample);
 
-            if (rr == READ_RESULT_OK) {
+            if (rr == READ_RESULT_OK)
+            {
                 sample.last_update_ms = now_ms;
             }
 
@@ -191,7 +196,8 @@ static void *sensor_thread_main(void *arg)
             sensor_bmp580_t sample = prev.bmp580;
             read_result_t rr = read_bmp580(&sample);
 
-            if (rr == READ_RESULT_OK) {
+            if (rr == READ_RESULT_OK)
+            {
                 sample.last_update_ms = now_ms;
             }
 
@@ -203,7 +209,8 @@ static void *sensor_thread_main(void *arg)
             sensor_sgp30_t sample = prev.sgp30;
             read_result_t rr = read_sgp30(&sample);
 
-            if (rr == READ_RESULT_OK) {
+            if (rr == READ_RESULT_OK)
+            {
                 sample.last_update_ms = now_ms;
             }
 
@@ -228,29 +235,28 @@ static uint64_t get_monotonic_time_ms(void)
     if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0)
         return 0;
 
-    return ((uint64_t)ts.tv_sec * 1000ULL) +
-           ((uint64_t)ts.tv_nsec / 1000000ULL);
+    return ((uint64_t)ts.tv_sec * 1000ULL) + ((uint64_t)ts.tv_nsec / 1000000ULL);
 }
 
-static sensor_status_t derive_sensor_status(read_result_t rr,
-                                            uint64_t now_ms,
+static sensor_status_t derive_sensor_status(read_result_t rr, uint64_t now_ms,
                                             uint64_t last_update_ms)
 {
-    switch (rr) {
-    case READ_RESULT_OK:
-        return SENSOR_STATUS_OK;
+    switch (rr)
+    {
+        case READ_RESULT_OK:
+            return SENSOR_STATUS_OK;
 
-    case READ_RESULT_MISSING:
-        return SENSOR_STATUS_MISSING;
+        case READ_RESULT_MISSING:
+            return SENSOR_STATUS_MISSING;
 
-    case READ_RESULT_ERROR:
-    default:
-        if (last_update_ms != 0 &&
-            now_ms >= last_update_ms &&
-            (now_ms - last_update_ms) > STALE_TIMEOUT_MS) {
-            return SENSOR_STATUS_STALE;
-        }
-        return SENSOR_STATUS_ERROR;
+        case READ_RESULT_ERROR:
+        default:
+            if (last_update_ms != 0 && now_ms >= last_update_ms &&
+                (now_ms - last_update_ms) > STALE_TIMEOUT_MS)
+            {
+                return SENSOR_STATUS_STALE;
+            }
+            return SENSOR_STATUS_ERROR;
     }
 }
 
@@ -264,10 +270,9 @@ static read_result_t read_bq27441(fuel_gauge_bq27441_t *out)
     if (!out)
         return READ_RESULT_ERROR;
 
-    if (!path_exists(BQ27441_STATUS_PATH) ||
-        !path_exists(BQ27441_CAPACITY_PATH) ||
-        !path_exists(BQ27441_VOLTAGE_PATH) ||
-        !path_exists(BQ27441_CURRENT_PATH)) {
+    if (!path_exists(BQ27441_STATUS_PATH) || !path_exists(BQ27441_CAPACITY_PATH) ||
+        !path_exists(BQ27441_VOLTAGE_PATH) || !path_exists(BQ27441_CURRENT_PATH))
+    {
         return READ_RESULT_MISSING;
     }
 
@@ -283,13 +288,20 @@ static read_result_t read_bq27441(fuel_gauge_bq27441_t *out)
     if (!read_int_from_file(BQ27441_CURRENT_PATH, &current_ua))
         return READ_RESULT_ERROR;
 
-    if (strcmp(status_buf, "Charging") == 0) {
+    if (strcmp(status_buf, "Charging") == 0)
+    {
         out->battery_status = BATTERY_STATUS_CHARGING;
-    } else if (strcmp(status_buf, "Discharging") == 0) {
+    }
+    else if (strcmp(status_buf, "Discharging") == 0)
+    {
         out->battery_status = BATTERY_STATUS_DISCHARGING;
-    } else if (strcmp(status_buf, "Full") == 0) {
+    }
+    else if (strcmp(status_buf, "Full") == 0)
+    {
         out->battery_status = BATTERY_STATUS_FULL;
-    } else {
+    }
+    else
+    {
         out->battery_status = BATTERY_STATUS_UNKNOWN;
     }
 
@@ -302,11 +314,8 @@ static read_result_t read_bq27441(fuel_gauge_bq27441_t *out)
     out->voltage_v = voltage_uv / 1000000.0f;
     out->current_ma = current_ua / 1000.0f;
 
-    LOGD("Read BQ27441: status=%s, capacity=%u%%, voltage=%.3f V, current=%.1f mA",
-         status_buf,
-         out->capacity_percent,
-         out->voltage_v,
-         out->current_ma);
+    LOGD("Read BQ27441: status=%s, capacity=%u%%, voltage=%.3f V, current=%.1f mA", status_buf,
+         out->capacity_percent, out->voltage_v, out->current_ma);
 
     return READ_RESULT_OK;
 }
@@ -320,9 +329,9 @@ static read_result_t read_scd30(sensor_scd30_t *out)
     if (!out)
         return READ_RESULT_ERROR;
 
-    if (!path_exists(SCD30_CO2_RAW_PATH) ||
-        !path_exists(SCD30_TEMP_PATH) ||
-        !path_exists(SCD30_HUMID_PATH)) {
+    if (!path_exists(SCD30_CO2_RAW_PATH) || !path_exists(SCD30_TEMP_PATH) ||
+        !path_exists(SCD30_HUMID_PATH))
+    {
         return READ_RESULT_MISSING;
     }
 
@@ -339,10 +348,8 @@ static read_result_t read_scd30(sensor_scd30_t *out)
     out->temperature_c = temp_milli / 1000.0f;
     out->humidity_rh = humid_milli / 1000.0f;
 
-    LOGD("Read SCD30: CO2=%.1f ppm, Temp=%.1f C, Humidity=%.1f %%",
-         out->co2_ppm,
-         out->temperature_c,
-         out->humidity_rh);
+    LOGD("Read SCD30: CO2=%.1f ppm, Temp=%.1f C, Humidity=%.1f %%", out->co2_ppm,
+         out->temperature_c, out->humidity_rh);
 
     return READ_RESULT_OK;
 }
@@ -355,8 +362,8 @@ static read_result_t read_bmp580(sensor_bmp580_t *out)
     if (!out)
         return READ_RESULT_ERROR;
 
-    if (!path_exists(BMP580_PRESSURE_PATH) ||
-        !path_exists(BMP580_TEMP_PATH)) {
+    if (!path_exists(BMP580_PRESSURE_PATH) || !path_exists(BMP580_TEMP_PATH))
+    {
         return READ_RESULT_MISSING;
     }
 
@@ -374,9 +381,7 @@ static read_result_t read_bmp580(sensor_bmp580_t *out)
     out->pressure_hpa = pressure_kpa * 10.0f;
     out->temperature_c = temp_milli / 1000.0f;
 
-    LOGD("Read BMP580: Pressure=%.2f hPa, Temp=%.2f C",
-         out->pressure_hpa,
-         out->temperature_c);
+    LOGD("Read BMP580: Pressure=%.2f hPa, Temp=%.2f C", out->pressure_hpa, out->temperature_c);
 
     return READ_RESULT_OK;
 }
@@ -389,8 +394,8 @@ static read_result_t read_sgp30(sensor_sgp30_t *out)
     if (!out)
         return READ_RESULT_ERROR;
 
-    if (!path_exists(SGP30_ECO2_PATH) ||
-        !path_exists(SGP30_TVOC_PATH)) {
+    if (!path_exists(SGP30_ECO2_PATH) || !path_exists(SGP30_TVOC_PATH))
+    {
         return READ_RESULT_MISSING;
     }
 
@@ -403,9 +408,7 @@ static read_result_t read_sgp30(sensor_sgp30_t *out)
     out->eco2_ppm = eco2_frac * 1000000.0f;
     out->tvoc_ppb = tvoc_frac * 1000000000.0f;
 
-    LOGD("Read SGP30: eCO2=%.0f ppm, TVOC=%.0f ppb",
-         out->eco2_ppm,
-         out->tvoc_ppb);
+    LOGD("Read SGP30: eCO2=%.0f ppm, TVOC=%.0f ppb", out->eco2_ppm, out->tvoc_ppb);
 
     return READ_RESULT_OK;
 }
@@ -476,10 +479,8 @@ static bool read_file_text(const char *path, char *buf, size_t buf_sz)
         return false;
 
     while (n > 0 &&
-           (buf[n - 1] == '\n' ||
-            buf[n - 1] == '\r' ||
-            buf[n - 1] == ' '  ||
-            buf[n - 1] == '\t')) {
+           (buf[n - 1] == '\n' || buf[n - 1] == '\r' || buf[n - 1] == ' ' || buf[n - 1] == '\t'))
+    {
         n--;
     }
 
