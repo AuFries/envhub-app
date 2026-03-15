@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(c|h)$' || true)
+
+if [ -z "$FILES" ]; then
+    exit 0
+fi
+
+if ! command -v clang-format >/dev/null 2>&1; then
+    echo "clang-format not found"
+    exit 1
+fi
+
+echo "[pre-commit] Formatting staged C files..."
+
+echo "$FILES" | while IFS= read -r file; do
+    [ -f "$file" ] || continue
+    clang-format -i "$file"
+    git add "$file"
+done
+
+echo "[pre-commit] Done."
