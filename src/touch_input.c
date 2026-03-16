@@ -17,10 +17,10 @@ static int g_raw_pressure = 0;
 
 static bool g_btn_touch = false;
 
-static int g_raw_x_left = 3700;
-static int g_raw_x_right = 450;
-static int g_raw_y_top = 3700;
-static int g_raw_y_bottom = 450;
+static int g_raw_x_left = 4095;
+static int g_raw_x_right = 0;
+static int g_raw_y_top = 4095;
+static int g_raw_y_bottom = 0;
 
 /* Require a reasonably firm press before reporting a touch */
 static int g_pressure_threshold = 1200;
