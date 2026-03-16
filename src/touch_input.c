@@ -13,12 +13,17 @@ static int g_screen_h = 240;
 
 static int g_raw_x = 0;
 static int g_raw_y = 0;
-static bool g_pressed = false;
+static int g_raw_pressure = 0;
+
+static bool g_btn_touch = false;
 
 static int g_raw_x_left = 3700;
 static int g_raw_x_right = 450;
 static int g_raw_y_top = 3700;
 static int g_raw_y_bottom = 450;
+
+/* Require a reasonably firm press before reporting a touch */
+static int g_pressure_threshold = 1200;
 
 static int clamp_i(int v, int lo, int hi)
 {
@@ -112,7 +117,7 @@ bool touch_input_get_state(bool *pressed, int *x, int *y)
             case EV_KEY:
                 if (ev.code == BTN_TOUCH)
                 {
-                    g_pressed = (ev.value != 0);
+                    g_btn_touch = (ev.value != 0);
                 }
                 break;
 
@@ -125,6 +130,10 @@ bool touch_input_get_state(bool *pressed, int *x, int *y)
                 {
                     g_raw_y = ev.value;
                 }
+                else if (ev.code == ABS_PRESSURE)
+                {
+                    g_raw_pressure = ev.value;
+                }
                 break;
 
             default:
@@ -132,7 +141,15 @@ bool touch_input_get_state(bool *pressed, int *x, int *y)
         }
     }
 
-    *pressed = g_pressed;
+    /*
+     * Require both:
+     *  - BTN_TOUCH asserted
+     *  - pressure above threshold
+     *
+     * This filters light/noisy touches on resistive panels.
+     */
+    *pressed = g_btn_touch && (g_raw_pressure >= g_pressure_threshold);
+
     *x = map_range_inverted(g_raw_x, g_raw_x_left, g_raw_x_right, g_screen_w);
     *y = map_range_inverted(g_raw_y, g_raw_y_top, g_raw_y_bottom, g_screen_h);
 
