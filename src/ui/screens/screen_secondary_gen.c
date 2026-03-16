@@ -116,10 +116,10 @@ lv_obj_t *screen_secondary_create(void)
     lv_obj_add_style(secondary_top_row, &header_panel, 0);
     lv_obj_t *secondary_back_btn = lv_button_create(secondary_top_row);
     lv_obj_set_name(secondary_back_btn, "secondary_back_btn");
-    lv_obj_set_width(secondary_back_btn, 44);
+    lv_obj_set_width(secondary_back_btn, 60);
     lv_obj_set_height(secondary_back_btn, 30);
     lv_obj_set_align(secondary_back_btn, LV_ALIGN_LEFT_MID);
-    lv_obj_set_x(secondary_back_btn, 6);
+    lv_obj_set_x(secondary_back_btn, -5);
     lv_obj_set_y(secondary_back_btn, 0);
     lv_obj_set_scrollbar_mode(secondary_back_btn, LV_SCROLLBAR_MODE_OFF);
     lv_obj_add_style(secondary_back_btn, &button_panel, 0);
@@ -132,7 +132,7 @@ lv_obj_t *screen_secondary_create(void)
     lv_obj_t *lv_label_0 = lv_label_create(secondary_top_row);
     lv_label_set_text(lv_label_0, "System Stats");
     lv_obj_set_align(lv_label_0, LV_ALIGN_CENTER);
-    lv_obj_set_x(lv_label_0, 20);
+    lv_obj_set_x(lv_label_0, 25);
     lv_obj_set_y(lv_label_0, 0);
     lv_obj_add_style(lv_label_0, &header_text, 0);
 

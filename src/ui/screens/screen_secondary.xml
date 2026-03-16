@@ -50,10 +50,10 @@
       <style name="header_panel" />
 
       <lv_button name="secondary_back_btn"
-                 width="44"
+                 width="60"
                  height="30"
                  align="left_mid"
-                 x="6"
+                 x="-5"
                  y="0"
                  scrollbar_mode="off">
         <style name="button_panel" />
@@ -62,7 +62,7 @@
         </lv_label>
       </lv_button>
 
-      <lv_label text="System Stats" align="center" x="20" y="0">
+      <lv_label text="System Stats" align="center" x="25" y="0">
         <style name="header_text" />
       </lv_label>
     </lv_obj>

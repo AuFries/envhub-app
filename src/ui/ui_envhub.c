@@ -295,6 +295,7 @@ static void main_top_panel_event_cb(lv_event_t *e)
 {
     if (lv_event_get_code(e) == LV_EVENT_CLICKED)
     {
+        syslog(LOG_DEBUG, "Showing secondary screen");
         ui_envhub_show_secondary_screen();
     }
 }
@@ -303,6 +304,7 @@ static void secondary_back_event_cb(lv_event_t *e)
 {
     if (lv_event_get_code(e) == LV_EVENT_CLICKED)
     {
+        syslog(LOG_DEBUG, "Showing main screen");
         ui_envhub_show_main_screen();
     }
 }
