@@ -120,84 +120,93 @@ void ui_envhub_set_time_text(const char *s)
     lv_label_set_text(time_label, buf);
 }
 
-void ui_envhub_set_bq27441(const ui_bq27441_data_t *bq27441)
+void ui_envhub_update_snapshot(const ui_envhub_snapshot_t *snapshot)
 {
     char buf[32];
 
+    if (snapshot == NULL)
+    {
+        return;
+    }
+
+    const sensor_snapshot_t *s = &snapshot->sensors;
+    const system_usage_t *sys = &snapshot->system;
+
+    if (s->scd30.status == SENSOR_STATUS_OK)
+    {
+        if (co2_label)
+        {
+            snprintf(buf, sizeof(buf), "%.0f", s->scd30.co2_ppm);
+            lv_label_set_text(co2_label, buf);
+        }
+
+        if (temp_label)
+        {
+            snprintf(buf, sizeof(buf), "%.1f", s->scd30.temperature_c);
+            lv_label_set_text(temp_label, buf);
+        }
+
+        if (humidity_label)
+        {
+            snprintf(buf, sizeof(buf), "%.1f", s->scd30.humidity_rh);
+            lv_label_set_text(humidity_label, buf);
+        }
+    }
+
+    if (s->bmp580.status == SENSOR_STATUS_OK)
+    {
+        if (pressure_label)
+        {
+            snprintf(buf, sizeof(buf), "%.1f", s->bmp580.pressure_hpa);
+            lv_label_set_text(pressure_label, buf);
+        }
+    }
+
+    if (s->sgp30.status == SENSOR_STATUS_OK)
+    {
+        if (tvoc_label)
+        {
+            snprintf(buf, sizeof(buf), "%.0f", s->sgp30.tvoc_ppb);
+            lv_label_set_text(tvoc_label, buf);
+        }
+
+        if (eco2_label)
+        {
+            snprintf(buf, sizeof(buf), "%.0f", s->sgp30.eco2_ppm);
+            lv_label_set_text(eco2_label, buf);
+        }
+    }
+
     if (battery_capacity_label)
     {
-        snprintf(buf, sizeof(buf), "%u%%", bq27441->capacity_percent);
+        snprintf(buf, sizeof(buf), "%u%%", s->bq27441.capacity_percent);
         lv_label_set_text(battery_capacity_label, buf);
     }
 
     if (batt_voltage_label)
     {
-        snprintf(buf, sizeof(buf), "%.2f", bq27441->voltage_v);
+        snprintf(buf, sizeof(buf), "%.2f V", s->bq27441.voltage_v);
         lv_label_set_text(batt_voltage_label, buf);
     }
 
     if (batt_current_label)
     {
-        snprintf(buf, sizeof(buf), "%.1f", bq27441->current_ma);
+        snprintf(buf, sizeof(buf), "%.0f mA", s->bq27441.current_ma);
         lv_label_set_text(batt_current_label, buf);
     }
-}
 
-void ui_envhub_set_scd30(const ui_scd30_data_t *scd30)
-{
-    char buf[32];
-
-    if (co2_label)
+    if (cpu_label)
     {
-        snprintf(buf, sizeof(buf), "%.0f", scd30->co2_ppm);
-        lv_label_set_text(co2_label, buf);
+        snprintf(buf, sizeof(buf), "%.1f%%", sys->cpu_percent);
+        lv_label_set_text(cpu_label, buf);
     }
 
-    if (temp_label)
+    if (mem_label)
     {
-        snprintf(buf, sizeof(buf), "%.1f", scd30->temperature_c);
-        lv_label_set_text(temp_label, buf);
-    }
-
-    if (humidity_label)
-    {
-        snprintf(buf, sizeof(buf), "%.1f", scd30->humidity_rh);
-        lv_label_set_text(humidity_label, buf);
+        snprintf(buf, sizeof(buf), "%.1f%%", sys->mem_percent);
+        lv_label_set_text(mem_label, buf);
     }
 }
-
-void ui_envhub_set_bmp580(const ui_bmp580_data_t *bmp580)
-{
-
-    char buf[32];
-
-    if (pressure_label)
-    {
-        snprintf(buf, sizeof(buf), "%.1f", bmp580->pressure_hpa);
-        lv_label_set_text(pressure_label, buf);
-    }
-}
-
-void ui_envhub_set_sgp30(const ui_sgp30_data_t *sgp30)
-{
-    char buf[32];
-
-    if (eco2_label)
-    {
-        snprintf(buf, sizeof(buf), "%.0f", sgp30->eco2_ppm);
-        lv_label_set_text(eco2_label, buf);
-    }
-
-    if (tvoc_label)
-    {
-        snprintf(buf, sizeof(buf), "%.0f", sgp30->tvoc_ppb);
-        lv_label_set_text(tvoc_label, buf);
-    }
-}
-
-void ui_envhub_set_sys_ina219() {}
-
-void ui_envhub_set_peripheral_ina219() {}
 
 void ui_envhub_show_shutdown_popup(void)
 {
@@ -234,17 +243,17 @@ void ui_envhub_set_status_summary(ui_status_severity_t severity, const char *tex
 
     switch (severity)
     {
-        case UI_STATUS_SEV_CRITICAL:
+        case STATUS_SEV_CRITICAL:
             bg_color = lv_palette_main(LV_PALETTE_RED);
             text_color = lv_color_white();
             break;
 
-        case UI_STATUS_SEV_WARNING:
+        case STATUS_SEV_WARNING:
             bg_color = lv_palette_main(LV_PALETTE_ORANGE);
             text_color = lv_color_black();
             break;
 
-        case UI_STATUS_SEV_INFO:
+        case STATUS_SEV_INFO:
         default:
             bg_color = lv_palette_main(LV_PALETTE_BLUE_GREY);
             text_color = lv_color_white();
@@ -261,28 +270,6 @@ void ui_envhub_set_status_summary(ui_status_severity_t severity, const char *tex
     if (status_label)
     {
         lv_obj_set_style_text_color(status_label, text_color, LV_PART_MAIN);
-    }
-}
-
-void ui_envhub_set_system_usage(const ui_system_usage_t *usage)
-{
-    char buf[32];
-
-    if (usage == NULL)
-    {
-        return;
-    }
-
-    if (cpu_label)
-    {
-        snprintf(buf, sizeof(buf), "%.1f%%", usage->cpu_percent);
-        lv_label_set_text(cpu_label, buf);
-    }
-
-    if (mem_label)
-    {
-        snprintf(buf, sizeof(buf), "%.1f%%", usage->mem_percent);
-        lv_label_set_text(mem_label, buf);
     }
 }
 
