@@ -200,37 +200,37 @@ lv_obj_t *screen_secondary_create(void)
     lv_obj_set_y(lv_label_3, -10);
     lv_obj_add_style(lv_label_3, &small_text, 0);
 
-    lv_obj_t *battery_voltage_value = lv_label_create(tile_batt_voltage);
-    lv_obj_set_name(battery_voltage_value, "battery_voltage_value");
-    lv_label_set_text(battery_voltage_value, "0.00");
-    lv_obj_set_align(battery_voltage_value, LV_ALIGN_CENTER);
-    lv_obj_set_x(battery_voltage_value, 0);
-    lv_obj_set_y(battery_voltage_value, 10);
-    lv_obj_add_style(battery_voltage_value, &label_text, 0);
+    lv_obj_t *batt_voltage_value = lv_label_create(tile_batt_voltage);
+    lv_obj_set_name(batt_voltage_value, "batt_voltage_value");
+    lv_label_set_text(batt_voltage_value, "0.00");
+    lv_obj_set_align(batt_voltage_value, LV_ALIGN_CENTER);
+    lv_obj_set_x(batt_voltage_value, 0);
+    lv_obj_set_y(batt_voltage_value, 10);
+    lv_obj_add_style(batt_voltage_value, &label_text, 0);
 
-    lv_obj_t *tile_system_current = lv_obj_create(secondary_power_wrap);
-    lv_obj_set_name(tile_system_current, "tile_system_current");
-    lv_obj_set_width(tile_system_current, 112);
-    lv_obj_set_height(tile_system_current, 50);
-    lv_obj_set_align(tile_system_current, LV_ALIGN_TOP_RIGHT);
-    lv_obj_set_x(tile_system_current, 10);
-    lv_obj_set_y(tile_system_current, -10);
-    lv_obj_set_scrollbar_mode(tile_system_current, LV_SCROLLBAR_MODE_OFF);
-    lv_obj_add_style(tile_system_current, &tile_panel, 0);
-    lv_obj_t *lv_label_4 = lv_label_create(tile_system_current);
+    lv_obj_t *tile_batt_current = lv_obj_create(secondary_power_wrap);
+    lv_obj_set_name(tile_batt_current, "tile_batt_current");
+    lv_obj_set_width(tile_batt_current, 112);
+    lv_obj_set_height(tile_batt_current, 50);
+    lv_obj_set_align(tile_batt_current, LV_ALIGN_TOP_RIGHT);
+    lv_obj_set_x(tile_batt_current, 10);
+    lv_obj_set_y(tile_batt_current, -10);
+    lv_obj_set_scrollbar_mode(tile_batt_current, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_add_style(tile_batt_current, &tile_panel, 0);
+    lv_obj_t *lv_label_4 = lv_label_create(tile_batt_current);
     lv_label_set_text(lv_label_4, "Batt I (mA)");
     lv_obj_set_align(lv_label_4, LV_ALIGN_CENTER);
     lv_obj_set_x(lv_label_4, 0);
     lv_obj_set_y(lv_label_4, -10);
     lv_obj_add_style(lv_label_4, &small_text, 0);
 
-    lv_obj_t *system_current_value = lv_label_create(tile_system_current);
-    lv_obj_set_name(system_current_value, "system_current_value");
-    lv_label_set_text(system_current_value, "0");
-    lv_obj_set_align(system_current_value, LV_ALIGN_CENTER);
-    lv_obj_set_x(system_current_value, 0);
-    lv_obj_set_y(system_current_value, 10);
-    lv_obj_add_style(system_current_value, &label_text, 0);
+    lv_obj_t *batt_current_value = lv_label_create(tile_batt_current);
+    lv_obj_set_name(batt_current_value, "batt_current_value");
+    lv_label_set_text(batt_current_value, "0");
+    lv_obj_set_align(batt_current_value, LV_ALIGN_CENTER);
+    lv_obj_set_x(batt_current_value, 0);
+    lv_obj_set_y(batt_current_value, 10);
+    lv_obj_add_style(batt_current_value, &label_text, 0);
 
     lv_obj_t *tile_system_power = lv_obj_create(secondary_power_wrap);
     lv_obj_set_name(tile_system_power, "tile_system_power");
@@ -242,7 +242,7 @@ lv_obj_t *screen_secondary_create(void)
     lv_obj_set_scrollbar_mode(tile_system_power, LV_SCROLLBAR_MODE_OFF);
     lv_obj_add_style(tile_system_power, &tile_panel, 0);
     lv_obj_t *lv_label_5 = lv_label_create(tile_system_power);
-    lv_label_set_text(lv_label_5, "Batt P (mW)");
+    lv_label_set_text(lv_label_5, "System P (mW)");
     lv_obj_set_align(lv_label_5, LV_ALIGN_CENTER);
     lv_obj_set_x(lv_label_5, 0);
     lv_obj_set_y(lv_label_5, -10);
@@ -341,13 +341,13 @@ lv_obj_t *screen_secondary_create(void)
     lv_obj_set_y(lv_label_10, 48);
     lv_obj_add_style(lv_label_10, &small_text, 0);
 
-    lv_obj_t *memory_util_value = lv_label_create(secondary_stats_panel);
-    lv_obj_set_name(memory_util_value, "memory_util_value");
-    lv_label_set_text(memory_util_value, "0");
-    lv_obj_set_align(memory_util_value, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(memory_util_value, 132);
-    lv_obj_set_y(memory_util_value, 64);
-    lv_obj_add_style(memory_util_value, &value_text, 0);
+    lv_obj_t *mem_util_value = lv_label_create(secondary_stats_panel);
+    lv_obj_set_name(mem_util_value, "mem_util_value");
+    lv_label_set_text(mem_util_value, "0");
+    lv_obj_set_align(mem_util_value, LV_ALIGN_TOP_LEFT);
+    lv_obj_set_x(mem_util_value, 132);
+    lv_obj_set_y(mem_util_value, 64);
+    lv_obj_add_style(mem_util_value, &value_text, 0);
 
     LV_TRACE_OBJ_CREATE("finished");
 

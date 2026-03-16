@@ -203,7 +203,7 @@
       <lv_label text="Memory (%)" align="top_left" x="132" y="48">
         <style name="small_text" />
       </lv_label>
-      <lv_label name="memory_util_value" text="0" align="top_left" x="132" y="64">
+      <lv_label name="mem_util_value" text="0" align="top_left" x="132" y="64">
         <style name="value_text" />
       </lv_label>
     </lv_obj>

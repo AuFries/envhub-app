@@ -20,6 +20,7 @@
 #include "ui/ui_envhub.h"
 #include "log.h"
 #include "touch_input.h"
+#include "system_usage.h"
 
 static volatile bool g_run = true;
 static volatile bool g_shutdown_in_progress = false;
@@ -42,7 +43,9 @@ static void app_sensor_timer_cb(lv_timer_t *t)
 
     sensor_snapshot_t snap;
     if (!sensor_service_get_snapshot(&snap))
+    {
         return;
+    }
 
     ui_scd30_data_t ui_scd30 = {
         .co2_ppm = snap.scd30.co2_ppm,
@@ -70,16 +73,33 @@ static void app_sensor_timer_cb(lv_timer_t *t)
     {
         ui_envhub_set_scd30(&ui_scd30);
     }
+
     if (snap.bmp580.status == SENSOR_STATUS_OK)
     {
         ui_envhub_set_bmp580(&ui_bmp580);
     }
+
     if (snap.sgp30.status == SENSOR_STATUS_OK)
     {
         ui_envhub_set_sgp30(&ui_sgp30);
     }
 
     ui_envhub_set_bq27441(&ui_bq27441);
+
+    system_usage_t usage;
+    if (system_usage_read(&usage))
+    {
+        ui_system_usage_t ui_usage = {
+            .cpu_percent = usage.cpu_percent,
+            .mem_percent = usage.mem_percent,
+        };
+
+        ui_envhub_set_system_usage(&ui_usage);
+    }
+    else
+    {
+        LOGW("failed to read system usage");
+    }
 
     uint64_t now_ms = get_monotonic_time_ms();
 
@@ -121,6 +141,11 @@ int main(int argc, char **argv)
     if (!data_logger_init())
     {
         syslog(LOG_ERR, "failed to initialize data logger");
+    }
+
+    if (!system_usage_init())
+    {
+        LOGW("failed to initialize system usage module");
     }
 
     sensor_service_init();
@@ -194,22 +219,30 @@ int main(int argc, char **argv)
 static void *tick_thread(void *arg)
 {
     (void)arg;
+
     while (g_run)
     {
         lv_tick_inc(1);
         usleep(1000);
     }
+
     return NULL;
 }
 
 static int64_t parse_i64(const char *s, int64_t def)
 {
     if (!s || !*s)
+    {
         return def;
+    }
+
     char *end = NULL;
     long long v = strtoll(s, &end, 0);
     if (end == s)
+    {
         return def;
+    }
+
     return (int64_t)v;
 }
 
@@ -219,9 +252,14 @@ static int lvgl_drm_init(int argc, char **argv)
     int64_t connector_id = -1;
 
     if (argc >= 2)
+    {
         card = argv[1];
+    }
+
     if (argc >= 3)
+    {
         connector_id = parse_i64(argv[2], -1);
+    }
 
     lv_init();
 

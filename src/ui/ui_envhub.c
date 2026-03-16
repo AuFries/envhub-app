@@ -34,6 +34,9 @@ static lv_obj_t *batt_voltage_label = NULL;
 static lv_obj_t *batt_current_label = NULL;
 static lv_obj_t *system_power_label = NULL;
 
+static lv_obj_t *cpu_label = NULL;
+static lv_obj_t *mem_label = NULL;
+
 /* Main screen functions */
 static void ui_envhub_show_main_screen(void);
 static void bind_main_screen(lv_obj_t *screen);
@@ -261,6 +264,28 @@ void ui_envhub_set_status_summary(ui_status_severity_t severity, const char *tex
     }
 }
 
+void ui_envhub_set_system_usage(const ui_system_usage_t *usage)
+{
+    char buf[32];
+
+    if (usage == NULL)
+    {
+        return;
+    }
+
+    if (cpu_label)
+    {
+        snprintf(buf, sizeof(buf), "%.1f%%", usage->cpu_percent);
+        lv_label_set_text(cpu_label, buf);
+    }
+
+    if (mem_label)
+    {
+        snprintf(buf, sizeof(buf), "%.1f%%", usage->mem_percent);
+        lv_label_set_text(mem_label, buf);
+    }
+}
+
 static void bind_main_screen(lv_obj_t *screen)
 {
     time_label = find_by_name_dfs(screen, "time");
@@ -298,6 +323,9 @@ static void bind_secondary_screen(lv_obj_t *screen)
     batt_current_label = find_by_name_dfs(screen, "batt_current_value");
     system_power_label = find_by_name_dfs(screen, "system_power_value");
 
+    cpu_label = find_by_name_dfs(screen, "cpu_util_value");
+    mem_label = find_by_name_dfs(screen, "mem_util_value");
+
     if (secondary_back_label)
     {
         lv_label_set_text(secondary_back_label, LV_SYMBOL_LEFT);
@@ -309,6 +337,7 @@ static void bind_secondary_screen(lv_obj_t *screen)
     }
 }
 
+// TODO: Update such that main sets time in it's interval callback
 static void time_update_cb(lv_timer_t *t)
 {
     (void)t;
