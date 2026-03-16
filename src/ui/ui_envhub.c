@@ -34,7 +34,6 @@ static lv_obj_t *secondary_back_label = NULL;
 static void ui_envhub_show_main_screen(void);
 static void bind_main_screen(lv_obj_t *screen);
 static void main_top_panel_event_cb(lv_event_t *e);
-static void main_apply_grid_cb(lv_timer_t *t);
 static void time_update_cb(lv_timer_t *t);
 
 /* Secondary screen functions */
@@ -60,141 +59,8 @@ void ui_envhub_init(void)
 
     ui_envhub_set_time_text(NULL);
     lv_timer_create(time_update_cb, 60000, NULL);
-    lv_timer_create(main_apply_grid_cb, 1, NULL); // Apply sensor grid
 
     lv_screen_load(main_screen);
-}
-
-static void bind_main_screen(lv_obj_t *screen)
-{
-    time_label = find_by_name_dfs(screen, "time");
-    time_panel = find_by_name_dfs(screen, "time_panel");
-    battery_panel = find_by_name_dfs(screen, "battery_panel");
-    battery_capacity_label = find_by_name_dfs(screen, "battery_capacity");
-    temp_label = find_by_name_dfs(screen, "temp_value");
-    humidity_label = find_by_name_dfs(screen, "humidity_value");
-    co2_label = find_by_name_dfs(screen, "co2_value");
-    pressure_label = find_by_name_dfs(screen, "pressure_value");
-    eco2_label = find_by_name_dfs(screen, "eco2_value");
-    tvoc_label = find_by_name_dfs(screen, "tvoc_value");
-    status_bar = find_by_name_dfs(screen, "status_bar");
-    status_label = find_by_name_dfs(screen, "status_label");
-
-    if (time_panel)
-    {
-        lv_obj_add_flag(time_panel, LV_OBJ_FLAG_CLICKABLE);
-        lv_obj_add_event_cb(time_panel, main_top_panel_event_cb, LV_EVENT_CLICKED, NULL);
-    }
-
-    if (battery_panel)
-    {
-        lv_obj_add_flag(battery_panel, LV_OBJ_FLAG_CLICKABLE);
-        lv_obj_add_event_cb(battery_panel, main_top_panel_event_cb, LV_EVENT_CLICKED, NULL);
-    }
-}
-
-static void bind_secondary_screen(lv_obj_t *screen)
-{
-    secondary_back_btn = find_by_name_dfs(screen, "secondary_back_btn");
-    secondary_back_label = find_by_name_dfs(screen, "secondary_back_label");
-
-    if (secondary_back_label)
-    {
-        lv_label_set_text(secondary_back_label, LV_SYMBOL_LEFT);
-    }
-
-    if (secondary_back_btn)
-    {
-        lv_obj_add_event_cb(secondary_back_btn, secondary_back_event_cb, LV_EVENT_CLICKED, NULL);
-    }
-}
-
-static lv_obj_t *find_tiles_wrap_anywhere(void)
-{
-    lv_display_t *d = lv_display_get_default();
-    if (!d)
-        return NULL;
-
-    lv_obj_t *roots[] = {
-        lv_display_get_screen_active(d),
-        lv_display_get_layer_top(d),
-        lv_display_get_layer_sys(d),
-        lv_display_get_layer_bottom(d),
-    };
-
-    for (size_t i = 0; i < sizeof(roots) / sizeof(roots[0]); i++)
-    {
-        lv_obj_t *hit = find_by_name_dfs(roots[i], "ui_tiles_wrap");
-        if (hit)
-            return hit;
-    }
-    return NULL;
-}
-
-static void main_apply_tiles_grid(lv_obj_t *wrap)
-{
-    if (!wrap)
-        return;
-
-    lv_obj_clear_flag(wrap, LV_OBJ_FLAG_SCROLLABLE);
-
-    static lv_coord_t col_dsc[] = {110, 110, LV_GRID_TEMPLATE_LAST};
-    static lv_coord_t row_dsc[] = {70, 70, 70, LV_GRID_TEMPLATE_LAST};
-
-    lv_obj_set_style_grid_column_dsc_array(wrap, col_dsc, 0);
-    lv_obj_set_style_grid_row_dsc_array(wrap, row_dsc, 0);
-    lv_obj_set_layout(wrap, LV_LAYOUT_GRID);
-
-    lv_obj_set_style_pad_left(wrap, 4, 0);
-    lv_obj_set_style_pad_right(wrap, 4, 0);
-    lv_obj_set_style_pad_top(wrap, 1, 0);
-    lv_obj_set_style_pad_row(wrap, 6, 0);
-    lv_obj_set_style_pad_column(wrap, 8, 0);
-
-    lv_obj_clear_flag(wrap, LV_OBJ_FLAG_SCROLLABLE);
-
-    uint32_t n = lv_obj_get_child_cnt(wrap);
-    if (n < 6)
-        return;
-
-    for (uint32_t i = 0; i < 6; i++)
-    {
-        lv_obj_t *tile = lv_obj_get_child(wrap, i);
-        uint32_t col = i % 2;
-        uint32_t row = i / 2;
-
-        lv_obj_set_grid_cell(tile, LV_GRID_ALIGN_STRETCH, col, 1, LV_GRID_ALIGN_STRETCH, row, 1);
-    }
-
-    lv_obj_update_layout(wrap);
-}
-
-static void remove_scrollbars(lv_obj_t *scr)
-{
-    lv_obj_set_scrollbar_mode(scr, LV_SCROLLBAR_MODE_OFF);
-    for (uint32_t i = 0; i < lv_obj_get_child_cnt(scr); i++)
-    {
-        lv_obj_t *tile = lv_obj_get_child(scr, i);
-        lv_obj_clear_flag(tile, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_set_scrollbar_mode(tile, LV_SCROLLBAR_MODE_OFF);
-    }
-}
-
-static void main_apply_grid_cb(lv_timer_t *t)
-{
-    lv_obj_t *wrap = find_tiles_wrap_anywhere();
-    if (wrap)
-    {
-        remove_scrollbars(wrap);
-        main_apply_tiles_grid(wrap);
-        lv_timer_del(t); /* done */
-    }
-}
-
-static void time_update_cb(lv_timer_t *t)
-{
-    (void)t;
-    ui_envhub_set_time_text(NULL);
 }
 
 void ui_envhub_set_time_text(const char *s)
@@ -370,6 +236,56 @@ void ui_envhub_set_status_summary(ui_status_severity_t severity, const char *tex
     {
         lv_obj_set_style_text_color(status_label, text_color, LV_PART_MAIN);
     }
+}
+
+static void bind_main_screen(lv_obj_t *screen)
+{
+    time_label = find_by_name_dfs(screen, "time");
+    time_panel = find_by_name_dfs(screen, "time_panel");
+    battery_panel = find_by_name_dfs(screen, "battery_panel");
+    battery_capacity_label = find_by_name_dfs(screen, "battery_capacity");
+    temp_label = find_by_name_dfs(screen, "temp_value");
+    humidity_label = find_by_name_dfs(screen, "humidity_value");
+    co2_label = find_by_name_dfs(screen, "co2_value");
+    pressure_label = find_by_name_dfs(screen, "pressure_value");
+    eco2_label = find_by_name_dfs(screen, "eco2_value");
+    tvoc_label = find_by_name_dfs(screen, "tvoc_value");
+    status_bar = find_by_name_dfs(screen, "status_bar");
+    status_label = find_by_name_dfs(screen, "status_label");
+
+    if (time_panel)
+    {
+        lv_obj_add_flag(time_panel, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_add_event_cb(time_panel, main_top_panel_event_cb, LV_EVENT_CLICKED, NULL);
+    }
+
+    if (battery_panel)
+    {
+        lv_obj_add_flag(battery_panel, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_add_event_cb(battery_panel, main_top_panel_event_cb, LV_EVENT_CLICKED, NULL);
+    }
+}
+
+static void bind_secondary_screen(lv_obj_t *screen)
+{
+    secondary_back_btn = find_by_name_dfs(screen, "secondary_back_btn");
+    secondary_back_label = find_by_name_dfs(screen, "secondary_back_label");
+
+    if (secondary_back_label)
+    {
+        lv_label_set_text(secondary_back_label, LV_SYMBOL_LEFT);
+    }
+
+    if (secondary_back_btn)
+    {
+        lv_obj_add_event_cb(secondary_back_btn, secondary_back_event_cb, LV_EVENT_CLICKED, NULL);
+    }
+}
+
+static void time_update_cb(lv_timer_t *t)
+{
+    (void)t;
+    ui_envhub_set_time_text(NULL);
 }
 
 static void main_top_panel_event_cb(lv_event_t *e)

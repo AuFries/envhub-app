@@ -7,11 +7,6 @@
           border_width="1"
           border_color="0x6C8794"
           radius="16"/>
-    <!-- pad_left="1"
-          pad_right="1"
-          pad_top="1"
-          pad_bottom="1" 
-          /> -->
 
     <style name="value_text" text_color="0x000000" text_font="plex_sans_24"/>
     <style name="label_text" text_color="0x000000" />
@@ -22,69 +17,152 @@
     <style name="style_main" />
 
     <!-- Top row -->
-    <lv_obj name="time_panel" width="160" height="40" align="top_left" x="2" y="0">
+    <lv_obj name="time_panel"
+            width="150"
+            height="40"
+            align="top_left"
+            x="2"
+            y="0"
+            scrollbar_mode="off">
       <style name="panel" />
       <lv_label name="time" text="Jan 1 00:00" align="center">
         <style name="value_text" />
       </lv_label>
     </lv_obj>
 
-    <lv_obj name="battery_panel" width="80" height="40" align="top_right" x="-2" y="0">
+    <lv_obj name="battery_panel"
+            width="85"
+            height="40"
+            align="top_right"
+            x="-2"
+            y="0"
+            scrollbar_mode="off">
       <style name="panel" />
       <lv_label name="battery_capacity" text="0%" align="center">
         <style name="value_text" />
       </lv_label>
     </lv_obj>
 
-    <!-- Tiles wrapper (positioned once) -->
-  <lv_obj name="ui_tiles_wrap" width="240" height="240" align="top_left" x="0" y="43">
-      <!-- Temperature -->
-    <lv_obj name="tile_temp" width="108" height="70">
+    <!-- Sensor tiles wrapper -->
+    <lv_obj name="ui_tiles_wrap"
+            width="236"
+            height="240"
+            align="top_mid"
+            x="0"
+            y="43"
+            scrollbar_mode="off">
       <style name="panel" />
-      <lv_label text="Temp (°C)" align="top_mid" y="-12"><style name="label_text" /></lv_label>
-      <lv_label name="temp_value" text="0" align="center" x="0" y="5"><style name="value_text" /></lv_label>
-    </lv_obj>
 
-      <!-- Humidity -->
-    <lv_obj name="tile_humidity" width="108" height="70">
-      <style name="panel" />
-      <lv_label text="Humidity (%)" align="top_mid" y="-12"><style name="label_text" /></lv_label>
-      <lv_label name="humidity_value" text="0" align="center" x="0" y="5"><style name="value_text" /></lv_label>
-    </lv_obj>
+      <!-- Row 1 -->
+      <lv_obj name="tile_temp"
+              width="108"
+              height="70"
+              align="top_left"
+              x="-8"
+              y="-4"
+              scrollbar_mode="off">
+        <style name="panel" />
+        <lv_label text="Temp (°C)" align="top_mid" y="-12">
+          <style name="label_text" />
+        </lv_label>
+        <lv_label name="temp_value" text="0" align="center" y="8">
+          <style name="value_text" />
+        </lv_label>
+      </lv_obj>
 
-      <!-- CO2 -->
-    <lv_obj name="tile_co2" width="108" height="70">
-      <style name="panel" />
-      <lv_label text="CO2 (ppm)" align="top_mid" y="-12"><style name="label_text" /></lv_label>
-      <lv_label name="co2_value" text="0" align="center" x="0" y="5"><style name="value_text" /></lv_label>
-    </lv_obj>
+      <lv_obj name="tile_humidity"
+              width="108"
+              height="70"
+              align="top_right"
+              x="8"
+              y="-4"
+              scrollbar_mode="off">
+        <style name="panel" />
+        <lv_label text="Humidity (%)" align="top_mid" y="-12">
+          <style name="label_text" />
+        </lv_label>
+        <lv_label name="humidity_value" text="0" align="center" y="8">
+          <style name="value_text" />
+        </lv_label>
+      </lv_obj>
 
-      <!-- Pressure -->
-    <lv_obj name="tile_pressure" width="108" height="70">
-      <style name="panel" />
-      <lv_label text="Press (hPa)" align="top_mid" y="-12"><style name="label_text" /></lv_label>
-      <lv_label name="pressure_value" text="0" align="center" x="0" y="5"><style name="value_text" /></lv_label>
-    </lv_obj>
+      <!-- Row 2 -->
+      <lv_obj name="tile_co2"
+              width="108"
+              height="70"
+              align="top_left"
+              x="-8"
+              y="71"
+              scrollbar_mode="off">
+        <style name="panel" />
+        <lv_label text="CO2 (ppm)" align="top_mid" y="-12">
+          <style name="label_text" />
+        </lv_label>
+        <lv_label name="co2_value" text="0" align="center" y="8">
+          <style name="value_text" />
+        </lv_label>
+      </lv_obj>
 
-      <!-- eCO2 -->
-    <lv_obj name="tile_eco2" width="108" height="70">
-      <style name="panel" />
-      <lv_label text="eCO2 (ppm)" align="top_mid" y="-12"><style name="label_text" /></lv_label>
-      <lv_label name="eco2_value" text="0" align="center" x="0" y="5"><style name="value_text" /></lv_label>
-    </lv_obj>
+      <lv_obj name="tile_pressure"
+              width="108"
+              height="70"
+              align="top_right"
+              x="8"
+              y="71"
+              scrollbar_mode="off">
+        <style name="panel" />
+        <lv_label text="Press (hPa)" align="top_mid" y="-12">
+          <style name="label_text" />
+        </lv_label>
+        <lv_label name="pressure_value" text="0" align="center" y="8">
+          <style name="value_text" />
+        </lv_label>
+      </lv_obj>
 
-      <!-- TVOC -->
-    <lv_obj name="tile_tvoc" width="108" height="70">
-      <style name="panel" />
-      <lv_label text="TVOC (ppb)" align="top_mid" x="0" y="-12"><style name="label_text" /></lv_label>
-      <lv_label name="tvoc_value" text="0" align="center" x="0" y="5"><style name="value_text" /></lv_label>
+      <!-- Row 3 -->
+      <lv_obj name="tile_eco2"
+              width="108"
+              height="70"
+              align="top_left"
+              x="-8"
+              y="146"
+              scrollbar_mode="off">
+        <style name="panel" />
+        <lv_label text="eCO2 (ppm)" align="top_mid" y="-12">
+          <style name="label_text" />
+        </lv_label>
+        <lv_label name="eco2_value" text="0" align="center" y="8">
+          <style name="value_text" />
+        </lv_label>
+      </lv_obj>
+
+      <lv_obj name="tile_tvoc"
+              width="108"
+              height="70"
+              align="top_right"
+              x="8"
+              y="146"
+              scrollbar_mode="off">
+        <style name="panel" />
+        <lv_label text="TVOC (ppb)" align="top_mid" y="-12">
+          <style name="label_text" />
+        </lv_label>
+        <lv_label name="tvoc_value" text="0" align="center" y="8">
+          <style name="value_text" />
+        </lv_label>
+      </lv_obj>
     </lv_obj>
-  </lv_obj>
 
     <!-- Status bar -->
-    <lv_obj name="status_bar" width="240" height="34" align="bottom_mid" x="0" y="0">
+    <lv_obj name="status_bar"
+            width="236"
+            height="34"
+            align="bottom_mid"
+            x="0"
+            y="0"
+            scrollbar_mode="off">
       <style name="panel" />
-      <lv_label name="status_label" text="Status" align="center" x="6">
+      <lv_label name="status_label" text="Status" align="center">
         <style name="label_text" />
       </lv_label>
     </lv_obj>
