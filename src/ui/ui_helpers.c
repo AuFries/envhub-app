@@ -18,3 +18,20 @@ lv_obj_t *find_by_name_dfs(lv_obj_t *root, const char *target)
     }
     return NULL;
 }
+
+void disable_scroll_recursive(lv_obj_t *obj)
+{
+    if (!obj)
+    {
+        return;
+    }
+
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+
+    uint32_t child_count = lv_obj_get_child_count(obj);
+    for (uint32_t i = 0; i < child_count; i++)
+    {
+        lv_obj_t *child = lv_obj_get_child(obj, i);
+        disable_scroll_recursive(child);
+    }
+}

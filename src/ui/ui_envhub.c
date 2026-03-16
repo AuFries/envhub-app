@@ -54,6 +54,9 @@ void ui_envhub_init(void)
         return;
     }
 
+    disable_scroll_recursive(main_screen);
+    disable_scroll_recursive(secondary_screen);
+
     bind_main_screen(main_screen);
     bind_secondary_screen(secondary_screen);
 
