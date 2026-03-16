@@ -57,10 +57,22 @@ typedef struct
 
 typedef struct
 {
+    float shunt_voltage_v; /* from in0_input, mV -> V */
+    float bus_voltage_v;   /* from in1_input, mV -> V */
+    float current_ma;      /* from curr1_input, mA */
+    float power_w;         /* from power1_input, uW -> W */
+    sensor_status_t status;
+    uint64_t last_update_ms;
+} sensor_ina219_t;
+
+typedef struct
+{
     fuel_gauge_bq27441_t bq27441;
     sensor_scd30_t scd30;
     sensor_bmp580_t bmp580;
     sensor_sgp30_t sgp30;
+    sensor_ina219_t ina219_system;
+    sensor_ina219_t ina219_peripheral;
 } sensor_snapshot_t;
 
 bool sensor_service_init(void);

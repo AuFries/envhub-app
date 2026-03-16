@@ -17,7 +17,7 @@ extern "C"
 
 #include "ui_envhub_gen.h"
 #include "sensors.h"
-#include "system_usage.h"
+#include "system_stats.h"
 #include "status.h"
 
     /*********************
@@ -30,7 +30,7 @@ extern "C"
     typedef struct
     {
         sensor_snapshot_t sensors;
-        system_usage_t system;
+        system_stats_t system;
     } ui_envhub_snapshot_t;
 
     /**********************
@@ -45,9 +45,6 @@ extern "C"
 
     void ui_envhub_set_status_summary(status_severity_t severity, const char *text);
     void ui_envhub_show_shutdown_popup(void);
-
-    void ui_envhub_set_time_text(const char *s);
-
     void ui_envhub_update_snapshot(const ui_envhub_snapshot_t *snapshot);
 
     /**********************

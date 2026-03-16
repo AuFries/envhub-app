@@ -20,7 +20,7 @@
 #include "ui/ui_envhub.h"
 #include "log.h"
 #include "touch_input.h"
-#include "system_usage.h"
+#include "system_stats.h"
 
 static volatile bool g_run = true;
 static volatile bool g_shutdown_in_progress = false;
@@ -52,9 +52,9 @@ static void app_sensor_timer_cb(lv_timer_t *t)
         .system = {0},
     };
 
-    if (!system_usage_read(&ui_snapshot.system))
+    if (!system_stats_read(&ui_snapshot.system))
     {
-        LOGW("failed to read system usage");
+        LOGW("failed to read system stats");
     }
 
     ui_envhub_update_snapshot(&ui_snapshot);
@@ -101,9 +101,9 @@ int main(int argc, char **argv)
         syslog(LOG_ERR, "failed to initialize data logger");
     }
 
-    if (!system_usage_init())
+    if (!system_stats_init())
     {
-        LOGW("failed to initialize system usage module");
+        LOGW("failed to initialize system stats module");
     }
 
     sensor_service_init();

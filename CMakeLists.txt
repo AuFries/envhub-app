@@ -39,7 +39,7 @@ add_executable(envhub-app
   src/status.c
   src/data_logger.c
   src/touch_input.c
-  src/system_usage.c
+  src/system_stats.c
 )
 
 target_include_directories(envhub-app

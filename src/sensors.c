@@ -35,6 +35,20 @@
 #define SGP30_ECO2_PATH SGP30_BASE "/in_concentration_co2_input"
 #define SGP30_TVOC_PATH SGP30_BASE "/in_concentration_voc_input"
 
+/*
+ * Per user:
+ *   hwmon1 = system INA219
+ *   hwmon2 = peripheral DC current sense INA219
+ */
+#define INA219_SYSTEM_BASE "/sys/class/hwmon/hwmon1"
+#define INA219_PERIPHERAL_BASE "/sys/class/hwmon/hwmon2"
+
+#define INA219_NAME_PATH(base) base "/name"
+#define INA219_SHUNT_MV_PATH(base) base "/in0_input"
+#define INA219_BUS_MV_PATH(base) base "/in1_input"
+#define INA219_CURRENT_MA_PATH(base) base "/curr1_input"
+#define INA219_POWER_UW_PATH(base) base "/power1_input"
+
 static pthread_t sensor_thread;
 static pthread_mutex_t sensor_mutex = PTHREAD_MUTEX_INITIALIZER;
 static sensor_snapshot_t snapshot;
@@ -53,6 +67,7 @@ static read_result_t read_bq27441(fuel_gauge_bq27441_t *out);
 static read_result_t read_scd30(sensor_scd30_t *out);
 static read_result_t read_bmp580(sensor_bmp580_t *out);
 static read_result_t read_sgp30(sensor_sgp30_t *out);
+static read_result_t read_ina219(const char *base_path, sensor_ina219_t *out);
 
 static bool read_int_from_file(const char *path, int *out);
 static bool read_float_from_file(const char *path, float *out);
@@ -74,6 +89,8 @@ bool sensor_service_init(void)
     snapshot.scd30.status = SENSOR_STATUS_MISSING;
     snapshot.bmp580.status = SENSOR_STATUS_MISSING;
     snapshot.sgp30.status = SENSOR_STATUS_MISSING;
+    snapshot.ina219_system.status = SENSOR_STATUS_MISSING;
+    snapshot.ina219_peripheral.status = SENSOR_STATUS_MISSING;
 
     running = false;
 
@@ -108,6 +125,8 @@ bool sensor_service_start(void)
         snapshot.scd30.status = SENSOR_STATUS_ERROR;
         snapshot.bmp580.status = SENSOR_STATUS_ERROR;
         snapshot.sgp30.status = SENSOR_STATUS_ERROR;
+        snapshot.ina219_system.status = SENSOR_STATUS_ERROR;
+        snapshot.ina219_peripheral.status = SENSOR_STATUS_ERROR;
 
         pthread_mutex_unlock(&sensor_mutex);
         return false;
@@ -216,6 +235,32 @@ static void *sensor_thread_main(void *arg)
 
             sample.status = derive_sensor_status(rr, now_ms, sample.last_update_ms);
             next.sgp30 = sample;
+        }
+
+        {
+            sensor_ina219_t sample = prev.ina219_system;
+            read_result_t rr = read_ina219(INA219_SYSTEM_BASE, &sample);
+
+            if (rr == READ_RESULT_OK)
+            {
+                sample.last_update_ms = now_ms;
+            }
+
+            sample.status = derive_sensor_status(rr, now_ms, sample.last_update_ms);
+            next.ina219_system = sample;
+        }
+
+        {
+            sensor_ina219_t sample = prev.ina219_peripheral;
+            read_result_t rr = read_ina219(INA219_PERIPHERAL_BASE, &sample);
+
+            if (rr == READ_RESULT_OK)
+            {
+                sample.last_update_ms = now_ms;
+            }
+
+            sample.status = derive_sensor_status(rr, now_ms, sample.last_update_ms);
+            next.ina219_peripheral = sample;
         }
 
         pthread_mutex_lock(&sensor_mutex);
@@ -409,6 +454,67 @@ static read_result_t read_sgp30(sensor_sgp30_t *out)
     out->tvoc_ppb = tvoc_frac * 1000000000.0f;
 
     LOGD("Read SGP30: eCO2=%.0f ppm, TVOC=%.0f ppb", out->eco2_ppm, out->tvoc_ppb);
+
+    return READ_RESULT_OK;
+}
+
+static read_result_t read_ina219(const char *base_path, sensor_ina219_t *out)
+{
+    char name_path[128];
+    char shunt_mv_path[128];
+    char bus_mv_path[128];
+    char current_ma_path[128];
+    char power_uw_path[128];
+    char name_buf[32];
+
+    int shunt_mv = 0;
+    int bus_mv = 0;
+    int current_ma = 0;
+    int power_uw = 0;
+
+    if (!base_path || !out)
+        return READ_RESULT_ERROR;
+
+    snprintf(name_path, sizeof(name_path), "%s/name", base_path);
+    snprintf(shunt_mv_path, sizeof(shunt_mv_path), "%s/in0_input", base_path);
+    snprintf(bus_mv_path, sizeof(bus_mv_path), "%s/in1_input", base_path);
+    snprintf(current_ma_path, sizeof(current_ma_path), "%s/curr1_input", base_path);
+    snprintf(power_uw_path, sizeof(power_uw_path), "%s/power1_input", base_path);
+
+    if (!path_exists(name_path) || !path_exists(shunt_mv_path) || !path_exists(bus_mv_path) ||
+        !path_exists(current_ma_path) || !path_exists(power_uw_path))
+    {
+        return READ_RESULT_MISSING;
+    }
+
+    if (!read_file_text(name_path, name_buf, sizeof(name_buf)))
+        return READ_RESULT_ERROR;
+
+    if (strcmp(name_buf, "ina219") != 0)
+    {
+        LOGW("Unexpected hwmon device at %s: name=%s", base_path, name_buf);
+        return READ_RESULT_MISSING;
+    }
+
+    if (!read_int_from_file(shunt_mv_path, &shunt_mv))
+        return READ_RESULT_ERROR;
+
+    if (!read_int_from_file(bus_mv_path, &bus_mv))
+        return READ_RESULT_ERROR;
+
+    if (!read_int_from_file(current_ma_path, &current_ma))
+        return READ_RESULT_ERROR;
+
+    if (!read_int_from_file(power_uw_path, &power_uw))
+        return READ_RESULT_ERROR;
+
+    out->shunt_voltage_v = shunt_mv / 1000.0f;
+    out->bus_voltage_v = bus_mv / 1000.0f;
+    out->current_ma = (float)current_ma;
+    out->power_w = power_uw / 1000000.0f;
+
+    LOGD("Read INA219 (%s): shunt=%.3f V, bus=%.3f V, current=%.1f mA, power=%.3f W", base_path,
+         out->shunt_voltage_v, out->bus_voltage_v, out->current_ma, out->power_w);
 
     return READ_RESULT_OK;
 }

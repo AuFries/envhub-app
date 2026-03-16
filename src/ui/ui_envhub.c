@@ -26,14 +26,15 @@ static lv_obj_t *status_label = NULL;
 
 /* Secondary screen objects */
 static lv_obj_t *secondary_screen = NULL;
-
 static lv_obj_t *secondary_back_btn = NULL;
 static lv_obj_t *secondary_back_label = NULL;
-
+static lv_obj_t *uptime_label = NULL;
 static lv_obj_t *batt_voltage_label = NULL;
 static lv_obj_t *batt_current_label = NULL;
 static lv_obj_t *system_power_label = NULL;
-
+static lv_obj_t *sensor_read_count_label = NULL;
+static lv_obj_t *peripheral_current_label = NULL;
+static lv_obj_t *compute_current_label = NULL;
 static lv_obj_t *cpu_label = NULL;
 static lv_obj_t *mem_label = NULL;
 
@@ -41,7 +42,7 @@ static lv_obj_t *mem_label = NULL;
 static void ui_envhub_show_main_screen(void);
 static void bind_main_screen(lv_obj_t *screen);
 static void main_top_panel_event_cb(lv_event_t *e);
-static void time_update_cb(lv_timer_t *t);
+// static void time_update_cb(lv_timer_t *t);
 
 /* Secondary screen functions */
 static void ui_envhub_show_secondary_screen(void);
@@ -67,58 +68,58 @@ void ui_envhub_init(void)
     bind_main_screen(main_screen);
     bind_secondary_screen(secondary_screen);
 
-    ui_envhub_set_time_text(NULL);
-    lv_timer_create(time_update_cb, 60000, NULL);
+    // ui_envhub_set_time_text(NULL);
+    // lv_timer_create(time_update_cb, 60000, NULL);
 
     lv_screen_load(main_screen);
 }
 
-void ui_envhub_set_time_text(const char *s)
-{
-    char buf[32];
+// void ui_envhub_set_time_text(const char *s)
+// {
+//     char buf[32];
 
-    if (!time_label)
-        return;
+//     if (!time_label)
+//         return;
 
-    if (!lv_obj_is_valid(time_label))
-    {
-        time_label = NULL;
-        return;
-    }
+//     if (!lv_obj_is_valid(time_label))
+//     {
+//         time_label = NULL;
+//         return;
+//     }
 
-    if (lv_obj_get_screen(time_label) == NULL)
-    {
-        return;
-    }
+//     if (lv_obj_get_screen(time_label) == NULL)
+//     {
+//         return;
+//     }
 
-    if (s)
-    {
-        lv_label_set_text(time_label, s);
-        return;
-    }
+//     if (s)
+//     {
+//         lv_label_set_text(time_label, s);
+//         return;
+//     }
 
-    time_t now = time(NULL);
-    if (now == (time_t)-1)
-    {
-        lv_label_set_text(time_label, "--");
-        return;
-    }
+//     time_t now = time(NULL);
+//     if (now == (time_t)-1)
+//     {
+//         lv_label_set_text(time_label, "--");
+//         return;
+//     }
 
-    struct tm tm_now;
-    if (!localtime_r(&now, &tm_now))
-    {
-        lv_label_set_text(time_label, "--");
-        return;
-    }
+//     struct tm tm_now;
+//     if (!localtime_r(&now, &tm_now))
+//     {
+//         lv_label_set_text(time_label, "--");
+//         return;
+//     }
 
-    if (strftime(buf, sizeof(buf), "%b %e %H:%M", &tm_now) == 0)
-    {
-        lv_label_set_text(time_label, "--");
-        return;
-    }
+//     if (strftime(buf, sizeof(buf), "%b %e %H:%M", &tm_now) == 0)
+//     {
+//         lv_label_set_text(time_label, "--");
+//         return;
+//     }
 
-    lv_label_set_text(time_label, buf);
-}
+//     lv_label_set_text(time_label, buf);
+// }
 
 void ui_envhub_update_snapshot(const ui_envhub_snapshot_t *snapshot)
 {
@@ -130,7 +131,7 @@ void ui_envhub_update_snapshot(const ui_envhub_snapshot_t *snapshot)
     }
 
     const sensor_snapshot_t *s = &snapshot->sensors;
-    const system_usage_t *sys = &snapshot->system;
+    const system_stats_t *sys = &snapshot->system;
 
     if (s->scd30.status == SENSOR_STATUS_OK)
     {
@@ -195,6 +196,49 @@ void ui_envhub_update_snapshot(const ui_envhub_snapshot_t *snapshot)
         lv_label_set_text(batt_current_label, buf);
     }
 
+    if (system_power_label)
+    {
+        if (s->ina219_system.status == SENSOR_STATUS_OK)
+        {
+            snprintf(buf, sizeof(buf), "%.2f W", s->ina219_system.power_w);
+        }
+        else
+        {
+            snprintf(buf, sizeof(buf), "--");
+        }
+        lv_label_set_text(system_power_label, buf);
+    }
+
+    if (peripheral_current_label)
+    {
+        if (s->ina219_peripheral.status == SENSOR_STATUS_OK)
+        {
+            snprintf(buf, sizeof(buf), "%.0f mA", s->ina219_peripheral.current_ma);
+        }
+        else
+        {
+            snprintf(buf, sizeof(buf), "--");
+        }
+        lv_label_set_text(peripheral_current_label, buf);
+    }
+
+    if (compute_current_label)
+    {
+        if (s->ina219_system.status == SENSOR_STATUS_OK &&
+            s->ina219_peripheral.status == SENSOR_STATUS_OK)
+        {
+            float compute_current_ma =
+                s->ina219_system.current_ma - s->ina219_peripheral.current_ma;
+
+            snprintf(buf, sizeof(buf), "%.0f mA", compute_current_ma);
+        }
+        else
+        {
+            snprintf(buf, sizeof(buf), "--");
+        }
+        lv_label_set_text(compute_current_label, buf);
+    }
+
     if (cpu_label)
     {
         snprintf(buf, sizeof(buf), "%.1f%%", sys->cpu_percent);
@@ -205,6 +249,38 @@ void ui_envhub_update_snapshot(const ui_envhub_snapshot_t *snapshot)
     {
         snprintf(buf, sizeof(buf), "%.1f%%", sys->mem_percent);
         lv_label_set_text(mem_label, buf);
+    }
+
+    if (time_label)
+    {
+        struct tm tm_now;
+
+        if (localtime_r(&sys->wall_time_epoch_s, &tm_now) != NULL)
+        {
+            strftime(buf, sizeof(buf), "%H:%M:%S", &tm_now);
+            lv_label_set_text(time_label, buf);
+        }
+    }
+
+    if (uptime_label)
+    {
+        uint64_t uptime = sys->uptime_seconds;
+        uint64_t hours = uptime / 3600U;
+        uint64_t minutes = (uptime % 3600U) / 60U;
+        uint64_t seconds = uptime % 60U;
+
+        if (hours > 0U)
+        {
+            snprintf(buf, sizeof(buf), "%lluh %llum %llus", (unsigned long long)hours,
+                     (unsigned long long)minutes, (unsigned long long)seconds);
+        }
+        else
+        {
+            snprintf(buf, sizeof(buf), "%llum %llus", (unsigned long long)minutes,
+                     (unsigned long long)seconds);
+        }
+
+        lv_label_set_text(uptime_label, buf);
     }
 }
 
@@ -228,7 +304,7 @@ void ui_envhub_show_shutdown_popup(void)
     lv_obj_center(label);
 }
 
-void ui_envhub_set_status_summary(ui_status_severity_t severity, const char *text)
+void ui_envhub_set_status_summary(status_severity_t severity, const char *text)
 {
     lv_color_t bg_color;
     lv_color_t text_color;
@@ -306,10 +382,15 @@ static void bind_secondary_screen(lv_obj_t *screen)
     secondary_back_btn = find_by_name_dfs(screen, "secondary_back_btn");
     secondary_back_label = find_by_name_dfs(screen, "secondary_back_label");
 
+    uptime_label = find_by_name_dfs(screen, "uptime_value");
+
     batt_voltage_label = find_by_name_dfs(screen, "batt_voltage_value");
     batt_current_label = find_by_name_dfs(screen, "batt_current_value");
     system_power_label = find_by_name_dfs(screen, "system_power_value");
+    sensor_read_count_label = find_by_name_dfs(screen, "sensor_read_count_value");
 
+    peripheral_current_label = find_by_name_dfs(screen, "peripheral_current_value");
+    compute_current_label = find_by_name_dfs(screen, "compute_current_value");
     cpu_label = find_by_name_dfs(screen, "cpu_util_value");
     mem_label = find_by_name_dfs(screen, "mem_util_value");
 
@@ -325,11 +406,11 @@ static void bind_secondary_screen(lv_obj_t *screen)
 }
 
 // TODO: Update such that main sets time in it's interval callback
-static void time_update_cb(lv_timer_t *t)
-{
-    (void)t;
-    ui_envhub_set_time_text(NULL);
-}
+// static void time_update_cb(lv_timer_t *t)
+// {
+//     (void)t;
+//     ui_envhub_set_time_text(NULL);
+// }
 
 static void main_top_panel_event_cb(lv_event_t *e)
 {

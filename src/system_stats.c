@@ -1,8 +1,9 @@
-#include "system_usage.h"
+#include "system_stats.h"
 
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <time.h>
 
 typedef struct
 {
@@ -110,13 +111,49 @@ static bool read_mem_percent(float *out_mem_percent)
         mem_available_kb = mem_total_kb;
     }
 
-    unsigned long long used_kb = mem_total_kb - mem_available_kb;
-    *out_mem_percent = ((float)used_kb * 100.0f) / (float)mem_total_kb;
+    {
+        unsigned long long used_kb = mem_total_kb - mem_available_kb;
+        *out_mem_percent = ((float)used_kb * 100.0f) / (float)mem_total_kb;
+    }
 
     return true;
 }
 
-bool system_usage_init(void)
+static bool read_wall_time(time_t *out_wall_time_epoch_s)
+{
+    time_t now = time(NULL);
+    if (now == (time_t)-1)
+    {
+        return false;
+    }
+
+    *out_wall_time_epoch_s = now;
+    return true;
+}
+
+static bool read_uptime_seconds(uint64_t *out_uptime_seconds)
+{
+    FILE *fp = fopen("/proc/uptime", "r");
+    if (!fp)
+    {
+        return false;
+    }
+
+    double uptime_s = 0.0;
+    int scanned = fscanf(fp, "%lf", &uptime_s);
+
+    fclose(fp);
+
+    if (scanned != 1 || uptime_s < 0.0)
+    {
+        return false;
+    }
+
+    *out_uptime_seconds = (uint64_t)uptime_s;
+    return true;
+}
+
+bool system_stats_init(void)
 {
     if (!read_cpu_stat(&g_prev_cpu_stat))
     {
@@ -128,8 +165,10 @@ bool system_usage_init(void)
     return true;
 }
 
-bool system_usage_read(system_usage_t *out)
+bool system_stats_read(system_stats_t *out)
 {
+    cpu_stat_t curr_cpu_stat;
+
     if (out == NULL)
     {
         return false;
@@ -137,13 +176,12 @@ bool system_usage_read(system_usage_t *out)
 
     if (!g_initialized)
     {
-        if (!system_usage_init())
+        if (!system_stats_init())
         {
             return false;
         }
     }
 
-    cpu_stat_t curr_cpu_stat;
     if (!read_cpu_stat(&curr_cpu_stat))
     {
         return false;
@@ -153,6 +191,16 @@ bool system_usage_read(system_usage_t *out)
     g_prev_cpu_stat = curr_cpu_stat;
 
     if (!read_mem_percent(&out->mem_percent))
+    {
+        return false;
+    }
+
+    if (!read_wall_time(&out->wall_time_epoch_s))
+    {
+        return false;
+    }
+
+    if (!read_uptime_seconds(&out->uptime_seconds))
     {
         return false;
     }
