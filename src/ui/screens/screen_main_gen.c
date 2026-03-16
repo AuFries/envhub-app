@@ -35,34 +35,61 @@ lv_obj_t *screen_main_create(void)
     LV_TRACE_OBJ_CREATE("begin");
 
     static lv_style_t style_main;
-    static lv_style_t panel;
+    static lv_style_t header_panel;
+    static lv_style_t tile_panel;
+    static lv_style_t status_panel;
+    static lv_style_t wrap_plain;
     static lv_style_t value_text;
     static lv_style_t label_text;
     static lv_style_t small_text;
+    static lv_style_t header_text;
+    static lv_style_t status_text;
 
     static bool style_inited = false;
 
     if (!style_inited)
     {
         lv_style_init(&style_main);
-        lv_style_set_bg_color(&style_main, lv_color_hex(0x00688a));
+        lv_style_set_bg_color(&style_main, lv_color_hex(0xE8EFF2));
 
-        lv_style_init(&panel);
-        lv_style_set_bg_color(&panel, lv_color_hex(0xFFFFFF));
-        lv_style_set_border_width(&panel, 1);
-        lv_style_set_border_color(&panel, lv_color_hex(0x6C8794));
-        lv_style_set_radius(&panel, 16);
+        lv_style_init(&header_panel);
+        lv_style_set_bg_color(&header_panel, lv_color_hex(0x2F6F7E));
+        lv_style_set_border_width(&header_panel, 0);
+        lv_style_set_radius(&header_panel, 16);
+
+        lv_style_init(&tile_panel);
+        lv_style_set_bg_color(&tile_panel, lv_color_hex(0xFFFFFF));
+        lv_style_set_border_width(&tile_panel, 1);
+        lv_style_set_border_color(&tile_panel, lv_color_hex(0xD6E0E5));
+        lv_style_set_radius(&tile_panel, 14);
+
+        lv_style_init(&status_panel);
+        lv_style_set_bg_color(&status_panel, lv_color_hex(0x2F6F7E));
+        lv_style_set_border_width(&status_panel, 0);
+        lv_style_set_radius(&status_panel, 16);
+
+        lv_style_init(&wrap_plain);
+        lv_style_set_bg_opa(&wrap_plain, 0);
+        lv_style_set_border_width(&wrap_plain, 0);
+        lv_style_set_radius(&wrap_plain, 0);
 
         lv_style_init(&value_text);
-        lv_style_set_text_color(&value_text, lv_color_hex(0x000000));
+        lv_style_set_text_color(&value_text, lv_color_hex(0x1F2A30));
         lv_style_set_text_font(&value_text, plex_sans_24);
 
         lv_style_init(&label_text);
-        lv_style_set_text_color(&label_text, lv_color_hex(0x000000));
+        lv_style_set_text_color(&label_text, lv_color_hex(0x5C6B73));
 
         lv_style_init(&small_text);
-        lv_style_set_text_color(&small_text, lv_color_hex(0x000000));
+        lv_style_set_text_color(&small_text, lv_color_hex(0x5C6B73));
         lv_style_set_text_font(&small_text, plex_sans_12);
+
+        lv_style_init(&header_text);
+        lv_style_set_text_color(&header_text, lv_color_hex(0xFFFFFF));
+        lv_style_set_text_font(&header_text, plex_sans_24);
+
+        lv_style_init(&status_text);
+        lv_style_set_text_color(&status_text, lv_color_hex(0xFFFFFF));
 
         style_inited = true;
     }
@@ -73,18 +100,18 @@ lv_obj_t *screen_main_create(void)
     lv_obj_add_style(lv_obj_0, &style_main, 0);
     lv_obj_t *time_panel = lv_obj_create(lv_obj_0);
     lv_obj_set_name(time_panel, "time_panel");
-    lv_obj_set_width(time_panel, 150);
+    lv_obj_set_width(time_panel, 148);
     lv_obj_set_height(time_panel, 40);
     lv_obj_set_align(time_panel, LV_ALIGN_TOP_LEFT);
     lv_obj_set_x(time_panel, 2);
     lv_obj_set_y(time_panel, 0);
     lv_obj_set_scrollbar_mode(time_panel, LV_SCROLLBAR_MODE_OFF);
-    lv_obj_add_style(time_panel, &panel, 0);
+    lv_obj_add_style(time_panel, &header_panel, 0);
     lv_obj_t *time = lv_label_create(time_panel);
     lv_obj_set_name(time, "time");
     lv_label_set_text(time, "Jan 1 00:00");
     lv_obj_set_align(time, LV_ALIGN_CENTER);
-    lv_obj_add_style(time, &value_text, 0);
+    lv_obj_add_style(time, &header_text, 0);
 
     lv_obj_t *battery_panel = lv_obj_create(lv_obj_0);
     lv_obj_set_name(battery_panel, "battery_panel");
@@ -94,12 +121,12 @@ lv_obj_t *screen_main_create(void)
     lv_obj_set_x(battery_panel, -2);
     lv_obj_set_y(battery_panel, 0);
     lv_obj_set_scrollbar_mode(battery_panel, LV_SCROLLBAR_MODE_OFF);
-    lv_obj_add_style(battery_panel, &panel, 0);
+    lv_obj_add_style(battery_panel, &header_panel, 0);
     lv_obj_t *battery_capacity = lv_label_create(battery_panel);
     lv_obj_set_name(battery_capacity, "battery_capacity");
     lv_label_set_text(battery_capacity, "0%");
     lv_obj_set_align(battery_capacity, LV_ALIGN_CENTER);
-    lv_obj_add_style(battery_capacity, &value_text, 0);
+    lv_obj_add_style(battery_capacity, &header_text, 0);
 
     lv_obj_t *ui_tiles_wrap = lv_obj_create(lv_obj_0);
     lv_obj_set_name(ui_tiles_wrap, "ui_tiles_wrap");
@@ -109,7 +136,7 @@ lv_obj_t *screen_main_create(void)
     lv_obj_set_x(ui_tiles_wrap, 0);
     lv_obj_set_y(ui_tiles_wrap, 43);
     lv_obj_set_scrollbar_mode(ui_tiles_wrap, LV_SCROLLBAR_MODE_OFF);
-    lv_obj_add_style(ui_tiles_wrap, &panel, 0);
+    lv_obj_add_style(ui_tiles_wrap, &wrap_plain, 0);
     lv_obj_t *tile_temp = lv_obj_create(ui_tiles_wrap);
     lv_obj_set_name(tile_temp, "tile_temp");
     lv_obj_set_width(tile_temp, 108);
@@ -118,7 +145,7 @@ lv_obj_t *screen_main_create(void)
     lv_obj_set_x(tile_temp, -8);
     lv_obj_set_y(tile_temp, -4);
     lv_obj_set_scrollbar_mode(tile_temp, LV_SCROLLBAR_MODE_OFF);
-    lv_obj_add_style(tile_temp, &panel, 0);
+    lv_obj_add_style(tile_temp, &tile_panel, 0);
     lv_obj_t *lv_label_0 = lv_label_create(tile_temp);
     lv_label_set_text(lv_label_0, "Temp (°C)");
     lv_obj_set_align(lv_label_0, LV_ALIGN_TOP_MID);
@@ -140,7 +167,7 @@ lv_obj_t *screen_main_create(void)
     lv_obj_set_x(tile_humidity, 8);
     lv_obj_set_y(tile_humidity, -4);
     lv_obj_set_scrollbar_mode(tile_humidity, LV_SCROLLBAR_MODE_OFF);
-    lv_obj_add_style(tile_humidity, &panel, 0);
+    lv_obj_add_style(tile_humidity, &tile_panel, 0);
     lv_obj_t *lv_label_1 = lv_label_create(tile_humidity);
     lv_label_set_text(lv_label_1, "Humidity (%)");
     lv_obj_set_align(lv_label_1, LV_ALIGN_TOP_MID);
@@ -162,7 +189,7 @@ lv_obj_t *screen_main_create(void)
     lv_obj_set_x(tile_co2, -8);
     lv_obj_set_y(tile_co2, 71);
     lv_obj_set_scrollbar_mode(tile_co2, LV_SCROLLBAR_MODE_OFF);
-    lv_obj_add_style(tile_co2, &panel, 0);
+    lv_obj_add_style(tile_co2, &tile_panel, 0);
     lv_obj_t *lv_label_2 = lv_label_create(tile_co2);
     lv_label_set_text(lv_label_2, "CO2 (ppm)");
     lv_obj_set_align(lv_label_2, LV_ALIGN_TOP_MID);
@@ -184,7 +211,7 @@ lv_obj_t *screen_main_create(void)
     lv_obj_set_x(tile_pressure, 8);
     lv_obj_set_y(tile_pressure, 71);
     lv_obj_set_scrollbar_mode(tile_pressure, LV_SCROLLBAR_MODE_OFF);
-    lv_obj_add_style(tile_pressure, &panel, 0);
+    lv_obj_add_style(tile_pressure, &tile_panel, 0);
     lv_obj_t *lv_label_3 = lv_label_create(tile_pressure);
     lv_label_set_text(lv_label_3, "Press (hPa)");
     lv_obj_set_align(lv_label_3, LV_ALIGN_TOP_MID);
@@ -206,7 +233,7 @@ lv_obj_t *screen_main_create(void)
     lv_obj_set_x(tile_eco2, -8);
     lv_obj_set_y(tile_eco2, 146);
     lv_obj_set_scrollbar_mode(tile_eco2, LV_SCROLLBAR_MODE_OFF);
-    lv_obj_add_style(tile_eco2, &panel, 0);
+    lv_obj_add_style(tile_eco2, &tile_panel, 0);
     lv_obj_t *lv_label_4 = lv_label_create(tile_eco2);
     lv_label_set_text(lv_label_4, "eCO2 (ppm)");
     lv_obj_set_align(lv_label_4, LV_ALIGN_TOP_MID);
@@ -228,7 +255,7 @@ lv_obj_t *screen_main_create(void)
     lv_obj_set_x(tile_tvoc, 8);
     lv_obj_set_y(tile_tvoc, 146);
     lv_obj_set_scrollbar_mode(tile_tvoc, LV_SCROLLBAR_MODE_OFF);
-    lv_obj_add_style(tile_tvoc, &panel, 0);
+    lv_obj_add_style(tile_tvoc, &tile_panel, 0);
     lv_obj_t *lv_label_5 = lv_label_create(tile_tvoc);
     lv_label_set_text(lv_label_5, "TVOC (ppb)");
     lv_obj_set_align(lv_label_5, LV_ALIGN_TOP_MID);
@@ -245,17 +272,17 @@ lv_obj_t *screen_main_create(void)
     lv_obj_t *status_bar = lv_obj_create(lv_obj_0);
     lv_obj_set_name(status_bar, "status_bar");
     lv_obj_set_width(status_bar, 236);
-    lv_obj_set_height(status_bar, 34);
+    lv_obj_set_height(status_bar, 37);
     lv_obj_set_align(status_bar, LV_ALIGN_BOTTOM_MID);
     lv_obj_set_x(status_bar, 0);
     lv_obj_set_y(status_bar, 0);
     lv_obj_set_scrollbar_mode(status_bar, LV_SCROLLBAR_MODE_OFF);
-    lv_obj_add_style(status_bar, &panel, 0);
+    lv_obj_add_style(status_bar, &status_panel, 0);
     lv_obj_t *status_label = lv_label_create(status_bar);
     lv_obj_set_name(status_label, "status_label");
     lv_label_set_text(status_label, "Status");
     lv_obj_set_align(status_label, LV_ALIGN_CENTER);
-    lv_obj_add_style(status_label, &label_text, 0);
+    lv_obj_add_style(status_label, &status_text, 0);
 
     LV_TRACE_OBJ_CREATE("finished");
 

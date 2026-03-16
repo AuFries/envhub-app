@@ -1,16 +1,33 @@
 <screen>
   <styles>
-    <style name="style_main" bg_color="0x00688a" />
+    <style name="style_main" bg_color="0xE8EFF2" />
 
-    <style name="panel"
-          bg_color="0xFFFFFF"
-          border_width="1"
-          border_color="0x6C8794"
+    <style name="header_panel"
+          bg_color="0x2F6F7E"
+          border_width="0"
           radius="16"/>
 
-    <style name="value_text" text_color="0x000000" text_font="plex_sans_24"/>
-    <style name="label_text" text_color="0x000000" />
-    <style name="small_text" text_color="0x000000" text_font="plex_sans_12"/>
+    <style name="tile_panel"
+          bg_color="0xFFFFFF"
+          border_width="1"
+          border_color="0xD6E0E5"
+          radius="14"/>
+
+    <style name="status_panel"
+          bg_color="0x2F6F7E"
+          border_width="0"
+          radius="16"/>
+
+    <style name="wrap_plain"
+          bg_opa="0"
+          border_width="0"
+          radius="0"/>
+
+    <style name="value_text" text_color="0x1F2A30" text_font="plex_sans_24"/>
+    <style name="label_text" text_color="0x5C6B73" />
+    <style name="small_text" text_color="0x5C6B73" text_font="plex_sans_12"/>
+    <style name="header_text" text_color="0xFFFFFF" text_font="plex_sans_24"/>
+    <style name="status_text" text_color="0xFFFFFF" />
   </styles>
 
   <view>
@@ -18,15 +35,15 @@
 
     <!-- Top row -->
     <lv_obj name="time_panel"
-            width="150"
+            width="148"
             height="40"
             align="top_left"
             x="2"
             y="0"
             scrollbar_mode="off">
-      <style name="panel" />
+      <style name="header_panel" />
       <lv_label name="time" text="Jan 1 00:00" align="center">
-        <style name="value_text" />
+        <style name="header_text" />
       </lv_label>
     </lv_obj>
 
@@ -37,9 +54,9 @@
             x="-2"
             y="0"
             scrollbar_mode="off">
-      <style name="panel" />
+      <style name="header_panel" />
       <lv_label name="battery_capacity" text="0%" align="center">
-        <style name="value_text" />
+        <style name="header_text" />
       </lv_label>
     </lv_obj>
 
@@ -51,7 +68,7 @@
             x="0"
             y="43"
             scrollbar_mode="off">
-      <style name="panel" />
+      <style name="wrap_plain" />
 
       <!-- Row 1 -->
       <lv_obj name="tile_temp"
@@ -61,7 +78,7 @@
               x="-8"
               y="-4"
               scrollbar_mode="off">
-        <style name="panel" />
+        <style name="tile_panel" />
         <lv_label text="Temp (°C)" align="top_mid" y="-12">
           <style name="label_text" />
         </lv_label>
@@ -77,7 +94,7 @@
               x="8"
               y="-4"
               scrollbar_mode="off">
-        <style name="panel" />
+        <style name="tile_panel" />
         <lv_label text="Humidity (%)" align="top_mid" y="-12">
           <style name="label_text" />
         </lv_label>
@@ -94,7 +111,7 @@
               x="-8"
               y="71"
               scrollbar_mode="off">
-        <style name="panel" />
+        <style name="tile_panel" />
         <lv_label text="CO2 (ppm)" align="top_mid" y="-12">
           <style name="label_text" />
         </lv_label>
@@ -110,7 +127,7 @@
               x="8"
               y="71"
               scrollbar_mode="off">
-        <style name="panel" />
+        <style name="tile_panel" />
         <lv_label text="Press (hPa)" align="top_mid" y="-12">
           <style name="label_text" />
         </lv_label>
@@ -127,7 +144,7 @@
               x="-8"
               y="146"
               scrollbar_mode="off">
-        <style name="panel" />
+        <style name="tile_panel" />
         <lv_label text="eCO2 (ppm)" align="top_mid" y="-12">
           <style name="label_text" />
         </lv_label>
@@ -143,7 +160,7 @@
               x="8"
               y="146"
               scrollbar_mode="off">
-        <style name="panel" />
+        <style name="tile_panel" />
         <lv_label text="TVOC (ppb)" align="top_mid" y="-12">
           <style name="label_text" />
         </lv_label>
@@ -156,14 +173,14 @@
     <!-- Status bar -->
     <lv_obj name="status_bar"
             width="236"
-            height="34"
+            height="37"
             align="bottom_mid"
             x="0"
             y="0"
             scrollbar_mode="off">
-      <style name="panel" />
+      <style name="status_panel" />
       <lv_label name="status_label" text="Status" align="center">
-        <style name="label_text" />
+        <style name="status_text" />
       </lv_label>
     </lv_obj>
   </view>
