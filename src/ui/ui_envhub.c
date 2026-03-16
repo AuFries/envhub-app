@@ -30,6 +30,10 @@ static lv_obj_t *secondary_screen = NULL;
 static lv_obj_t *secondary_back_btn = NULL;
 static lv_obj_t *secondary_back_label = NULL;
 
+static lv_obj_t *batt_voltage_label = NULL;
+static lv_obj_t *batt_current_label = NULL;
+static lv_obj_t *system_power_label = NULL;
+
 /* Main screen functions */
 static void ui_envhub_show_main_screen(void);
 static void bind_main_screen(lv_obj_t *screen);
@@ -122,6 +126,18 @@ void ui_envhub_set_bq27441(const ui_bq27441_data_t *bq27441)
         snprintf(buf, sizeof(buf), "%u%%", bq27441->capacity_percent);
         lv_label_set_text(battery_capacity_label, buf);
     }
+
+    if (batt_voltage_label)
+    {
+        snprintf(buf, sizeof(buf), "%.2f", bq27441->voltage_v);
+        lv_label_set_text(batt_voltage_label, buf);
+    }
+
+    if (batt_current_label)
+    {
+        snprintf(buf, sizeof(buf), "%.1f", bq27441->current_ma);
+        lv_label_set_text(batt_current_label, buf);
+    }
 }
 
 void ui_envhub_set_scd30(const ui_scd30_data_t *scd30)
@@ -175,6 +191,10 @@ void ui_envhub_set_sgp30(const ui_sgp30_data_t *sgp30)
         lv_label_set_text(tvoc_label, buf);
     }
 }
+
+void ui_envhub_set_sys_ina219() {}
+
+void ui_envhub_set_peripheral_ina219() {}
 
 void ui_envhub_show_shutdown_popup(void)
 {
@@ -273,6 +293,10 @@ static void bind_secondary_screen(lv_obj_t *screen)
 {
     secondary_back_btn = find_by_name_dfs(screen, "secondary_back_btn");
     secondary_back_label = find_by_name_dfs(screen, "secondary_back_label");
+
+    batt_voltage_label = find_by_name_dfs(screen, "batt_voltage_value");
+    batt_current_label = find_by_name_dfs(screen, "batt_current_value");
+    system_power_label = find_by_name_dfs(screen, "system_power_value");
 
     if (secondary_back_label)
     {

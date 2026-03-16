@@ -78,6 +78,9 @@ extern "C"
     void ui_envhub_set_bmp580(const ui_bmp580_data_t *bmp580);
     void ui_envhub_set_sgp30(const ui_sgp30_data_t *sgp30);
 
+    void ui_envhub_set_cpu_usage(float percent);
+    void ui_envhub_set_memory_usage(float percent);
+
     /**********************
      *      MACROS
      **********************/

@@ -218,7 +218,7 @@ lv_obj_t *screen_secondary_create(void)
     lv_obj_set_scrollbar_mode(tile_system_current, LV_SCROLLBAR_MODE_OFF);
     lv_obj_add_style(tile_system_current, &tile_panel, 0);
     lv_obj_t *lv_label_4 = lv_label_create(tile_system_current);
-    lv_label_set_text(lv_label_4, "System I (mA)");
+    lv_label_set_text(lv_label_4, "Batt I (mA)");
     lv_obj_set_align(lv_label_4, LV_ALIGN_CENTER);
     lv_obj_set_x(lv_label_4, 0);
     lv_obj_set_y(lv_label_4, -10);
@@ -242,7 +242,7 @@ lv_obj_t *screen_secondary_create(void)
     lv_obj_set_scrollbar_mode(tile_system_power, LV_SCROLLBAR_MODE_OFF);
     lv_obj_add_style(tile_system_power, &tile_panel, 0);
     lv_obj_t *lv_label_5 = lv_label_create(tile_system_power);
-    lv_label_set_text(lv_label_5, "System P (mW)");
+    lv_label_set_text(lv_label_5, "Batt P (mW)");
     lv_obj_set_align(lv_label_5, LV_ALIGN_CENTER);
     lv_obj_set_x(lv_label_5, 0);
     lv_obj_set_y(lv_label_5, -10);
@@ -266,7 +266,7 @@ lv_obj_t *screen_secondary_create(void)
     lv_obj_set_scrollbar_mode(tile_sensor_reads, LV_SCROLLBAR_MODE_OFF);
     lv_obj_add_style(tile_sensor_reads, &tile_panel, 0);
     lv_obj_t *lv_label_6 = lv_label_create(tile_sensor_reads);
-    lv_label_set_text(lv_label_6, "Reads");
+    lv_label_set_text(lv_label_6, "Sensor Reads");
     lv_obj_set_align(lv_label_6, LV_ALIGN_CENTER);
     lv_obj_set_x(lv_label_6, 0);
     lv_obj_set_y(lv_label_6, -10);

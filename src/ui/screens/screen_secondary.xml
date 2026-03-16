@@ -113,12 +113,12 @@
         <lv_label text="Batt V" align="center" x="0" y="-10">
           <style name="small_text" />
         </lv_label>
-        <lv_label name="battery_voltage_value" text="0.00" align="center" x="0" y="10">
+        <lv_label name="batt_voltage_value" text="0.00" align="center" x="0" y="10">
           <style name="label_text" />
         </lv_label>
       </lv_obj>
 
-      <lv_obj name="tile_system_current"
+      <lv_obj name="tile_batt_current"
               width="112"
               height="50"
               align="top_right"
@@ -126,10 +126,10 @@
               y="-10"
               scrollbar_mode="off">
         <style name="tile_panel" />
-        <lv_label text="System I (mA)" align="center" x="0" y="-10">
+        <lv_label text="Batt I (mA)" align="center" x="0" y="-10">
           <style name="small_text" />
         </lv_label>
-        <lv_label name="system_current_value" text="0" align="center" x="0" y="10">
+        <lv_label name="batt_current_value" text="0" align="center" x="0" y="10">
           <style name="label_text" />
         </lv_label>
       </lv_obj>
@@ -158,7 +158,7 @@
               y="10"
               scrollbar_mode="off">
         <style name="tile_panel" />
-        <lv_label text="Reads" align="center" x="0" y="-10">
+        <lv_label text="Sensor Reads" align="center" x="0" y="-10">
           <style name="small_text" />
         </lv_label>
         <lv_label name="sensor_reads_value" text="0" align="center" x="0" y="10">
