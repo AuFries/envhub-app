@@ -1,13 +1,141 @@
 <screen>
-	<styles>
-		<style name="style_main" bg_color="0x00688a" />
-	</styles>
+  <styles>
+    <style name="style_main" bg_color="0x00688a" />
 
-	<view>
-		<style name="style_main" />
+    <style name="panel"
+          bg_color="0xFFFFFF"
+          border_width="1"
+          border_color="0x6C8794"
+          radius="16"/>
 
-		<lv_button align="center" style_bg_color="0x111">
-			<lv_label text="Hello world"/>
+    <style name="button_panel"
+          bg_color="0xFFFFFF"
+          border_width="1"
+          border_color="0x6C8794"
+          radius="12"/>
+
+    <style name="value_text" text_color="0x000000" text_font="plex_sans_24"/>
+    <style name="label_text" text_color="0x000000" />
+    <style name="small_text" text_color="0x000000" text_font="plex_sans_12"/>
+    <style name="title_text" text_color="0x000000" text_font="plex_sans_24"/>
+  </styles>
+
+  <view>
+    <style name="style_main" />
+
+    <!-- Top bar -->
+    <lv_obj name="secondary_top_row" width="236" height="42" align="top_mid" x="0" y="2" scrollbar_mode="off">
+      <style name="panel" />
+
+		<lv_button name="secondary_back_btn" width="44" height="30" align="left_mid" x="6" y="0">
+		<style name="button_panel" />
+		<lv_label name="secondary_back_label" text="" align="center">
+			<style name="label_text" />
+		</lv_label>
 		</lv_button>
-	</view>
+
+      <lv_label text="System Stats" align="center" x="20" y="0">
+        <style name="title_text" />
+      </lv_label>
+    </lv_obj>
+
+    <!-- Presence / uptime strip -->
+    <lv_obj name="secondary_status_row" width="236" height="44" align="top_mid" x="0" y="48" scrollbar_mode="off">
+      <style name="panel" />
+
+      <lv_label text="Presence (%)" align="left_mid" x="10" y="-8">
+        <style name="small_text" />
+      </lv_label>
+      <lv_label name="presence_value" text="0" align="left_mid" x="10" y="10">
+        <style name="value_text" />
+      </lv_label>
+
+      <lv_label text="Uptime" align="right_mid" x="-72" y="-8">
+        <style name="small_text" />
+      </lv_label>
+      <lv_label name="uptime_value" text="00:00:00" align="right_mid" x="-10" y="10">
+        <style name="value_text" />
+      </lv_label>
+    </lv_obj>
+
+    <!-- Power tiles -->
+    <lv_obj name="secondary_power_wrap" width="236" height="112" align="top_mid" x="0" y="96">
+      <style name="panel" />
+
+      <lv_obj name="tile_batt_voltage" width="104" height="42" align="top_left" x="8" y="8">
+        <style name="panel" />
+        <lv_label text="Batt V" align="top_left" x="6" y="2">
+          <style name="small_text" />
+        </lv_label>
+        <lv_label name="battery_voltage_value" text="0.00 V" align="bottom_mid" y="-2">
+          <style name="label_text" />
+        </lv_label>
+      </lv_obj>
+
+      <lv_obj name="tile_system_current" width="104" height="42" align="top_right" x="-8" y="8">
+        <style name="panel" />
+        <lv_label text="System I" align="top_left" x="6" y="2">
+          <style name="small_text" />
+        </lv_label>
+        <lv_label name="system_current_value" text="0 mA" align="bottom_mid" y="-2">
+          <style name="label_text" />
+        </lv_label>
+      </lv_obj>
+
+      <lv_obj name="tile_system_power" width="104" height="42" align="bottom_left" x="8" y="-8">
+        <style name="panel" />
+        <lv_label text="System P" align="top_left" x="6" y="2">
+          <style name="small_text" />
+        </lv_label>
+        <lv_label name="system_power_value" text="0.00 W" align="bottom_mid" y="-2">
+          <style name="label_text" />
+        </lv_label>
+      </lv_obj>
+
+      <lv_obj name="tile_sensor_reads" width="104" height="42" align="bottom_right" x="-8" y="-8">
+        <style name="panel" />
+        <lv_label text="Reads" align="top_left" x="6" y="2">
+          <style name="small_text" />
+        </lv_label>
+        <lv_label name="sensor_reads_value" text="0" align="bottom_mid" y="-2">
+          <style name="label_text" />
+        </lv_label>
+      </lv_obj>
+    </lv_obj>
+
+    <!-- Detailed stats -->
+    <lv_obj name="secondary_stats_panel" width="236" height="102" align="bottom_mid" x="0" y="-4">
+      <style name="panel" />
+
+      <!-- Left column -->
+      <lv_label text="Peripherals" align="top_left" x="10" y="8">
+        <style name="small_text" />
+      </lv_label>
+      <lv_label name="peripheral_current_value" text="0 mA" align="top_left" x="10" y="24">
+        <style name="label_text" />
+      </lv_label>
+
+      <lv_label text="Compute" align="top_left" x="10" y="46">
+        <style name="small_text" />
+      </lv_label>
+      <lv_label name="compute_current_value" text="0 mA" align="top_left" x="10" y="62">
+        <style name="label_text" />
+      </lv_label>
+
+      <!-- Right column -->
+      <lv_label text="CPU" align="top_right" x="-72" y="8">
+        <style name="small_text" />
+      </lv_label>
+      <lv_label name="cpu_util_value" text="0%" align="top_right" x="-10" y="24">
+        <style name="label_text" />
+      </lv_label>
+
+      <lv_label text="Memory" align="top_right" x="-72" y="46">
+        <style name="small_text" />
+      </lv_label>
+      <lv_label name="memory_util_value" text="0%" align="top_right" x="-10" y="62">
+        <style name="label_text" />
+      </lv_label>
+    </lv_obj>
+  </view>
 </screen>

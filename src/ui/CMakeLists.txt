@@ -22,6 +22,10 @@ endif()
 
 list(APPEND UI_SOURCES ${EXTRA_SOURCES})
 
+list(APPEND UI_SOURCES
+  ${CMAKE_CURRENT_LIST_DIR}/ui_helpers.c
+)
+
 if("${UI_SOURCES}" STREQUAL "")
   message(FATAL_ERROR "UI_SOURCES is empty.")
 endif()

@@ -4,49 +4,109 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <syslog.h>
 
 #include "ui_envhub.h"
+#include "ui_helpers.h"
 
-static lv_obj_t *status_bar = NULL;
-static lv_obj_t *status_label = NULL;
-
+/* Main screen objects */
+static lv_obj_t *main_screen = NULL;
+static lv_obj_t *time_panel = NULL;
+static lv_obj_t *battery_panel = NULL;
 static lv_obj_t *time_label = NULL;
 static lv_obj_t *battery_capacity_label = NULL;
-static lv_obj_t *co2_label = NULL;
 static lv_obj_t *temp_label = NULL;
 static lv_obj_t *humidity_label = NULL;
+static lv_obj_t *co2_label = NULL;
 static lv_obj_t *pressure_label = NULL;
 static lv_obj_t *eco2_label = NULL;
 static lv_obj_t *tvoc_label = NULL;
+static lv_obj_t *status_bar = NULL;
+static lv_obj_t *status_label = NULL;
 
-// static lv_obj_t *power_label = NULL;
-// static lv_obj_t *current_label = NULL;
-// static lv_obj_t *voltage_label = NULL;
+/* Secondary screen objects */
+static lv_obj_t *secondary_screen = NULL;
 
-static lv_obj_t *time_panel = NULL;
-static lv_obj_t *battery_panel = NULL;
+static lv_obj_t *secondary_back_btn = NULL;
+static lv_obj_t *secondary_back_label = NULL;
 
-static void bind_labels(lv_obj_t *screen);
+/* Main screen functions */
+static void ui_envhub_show_main_screen(void);
+static void bind_main_screen(lv_obj_t *screen);
+static void main_top_panel_event_cb(lv_event_t *e);
+static void main_apply_grid_cb(lv_timer_t *t);
 static void time_update_cb(lv_timer_t *t);
-static void top_panel_event_cb(lv_event_t *e);
 
-static lv_obj_t *find_by_name_dfs(lv_obj_t *root, const char *target)
+/* Secondary screen functions */
+static void ui_envhub_show_secondary_screen(void);
+static void bind_secondary_screen(lv_obj_t *screen);
+static void secondary_back_event_cb(lv_event_t *e);
+
+void ui_envhub_init(void)
 {
-    if (!root)
-        return NULL;
+    ui_envhub_init_gen(NULL);
 
-    const char *n = lv_obj_get_name(root); /* LVGL 9 */
-    if (n && strcmp(n, target) == 0)
-        return root;
+    main_screen = screen_main_create();
+    secondary_screen = screen_secondary_create();
 
-    uint32_t cnt = lv_obj_get_child_cnt(root);
-    for (uint32_t i = 0; i < cnt; i++)
+    if (!main_screen || !secondary_screen)
     {
-        lv_obj_t *hit = find_by_name_dfs(lv_obj_get_child(root, i), target);
-        if (hit)
-            return hit;
+        syslog(LOG_ERR, "Failed to create UI screens");
+        return;
     }
-    return NULL;
+
+    bind_main_screen(main_screen);
+    bind_secondary_screen(secondary_screen);
+
+    ui_envhub_set_time_text(NULL);
+    lv_timer_create(time_update_cb, 60000, NULL);
+    lv_timer_create(main_apply_grid_cb, 1, NULL); // Apply sensor grid
+
+    lv_screen_load(main_screen);
+}
+
+static void bind_main_screen(lv_obj_t *screen)
+{
+    time_label = find_by_name_dfs(screen, "time");
+    time_panel = find_by_name_dfs(screen, "time_panel");
+    battery_panel = find_by_name_dfs(screen, "battery_panel");
+    battery_capacity_label = find_by_name_dfs(screen, "battery_capacity");
+    temp_label = find_by_name_dfs(screen, "temp_value");
+    humidity_label = find_by_name_dfs(screen, "humidity_value");
+    co2_label = find_by_name_dfs(screen, "co2_value");
+    pressure_label = find_by_name_dfs(screen, "pressure_value");
+    eco2_label = find_by_name_dfs(screen, "eco2_value");
+    tvoc_label = find_by_name_dfs(screen, "tvoc_value");
+    status_bar = find_by_name_dfs(screen, "status_bar");
+    status_label = find_by_name_dfs(screen, "status_label");
+
+    if (time_panel)
+    {
+        lv_obj_add_flag(time_panel, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_add_event_cb(time_panel, main_top_panel_event_cb, LV_EVENT_CLICKED, NULL);
+    }
+
+    if (battery_panel)
+    {
+        lv_obj_add_flag(battery_panel, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_add_event_cb(battery_panel, main_top_panel_event_cb, LV_EVENT_CLICKED, NULL);
+    }
+}
+
+static void bind_secondary_screen(lv_obj_t *screen)
+{
+    secondary_back_btn = find_by_name_dfs(screen, "secondary_back_btn");
+    secondary_back_label = find_by_name_dfs(screen, "secondary_back_label");
+
+    if (secondary_back_label)
+    {
+        lv_label_set_text(secondary_back_label, LV_SYMBOL_LEFT);
+    }
+
+    if (secondary_back_btn)
+    {
+        lv_obj_add_event_cb(secondary_back_btn, secondary_back_event_cb, LV_EVENT_CLICKED, NULL);
+    }
 }
 
 static lv_obj_t *find_tiles_wrap_anywhere(void)
@@ -71,7 +131,7 @@ static lv_obj_t *find_tiles_wrap_anywhere(void)
     return NULL;
 }
 
-static void apply_tiles_grid(lv_obj_t *wrap)
+static void main_apply_tiles_grid(lv_obj_t *wrap)
 {
     if (!wrap)
         return;
@@ -120,70 +180,15 @@ static void remove_scrollbars(lv_obj_t *scr)
     }
 }
 
-static void apply_grid_cb(lv_timer_t *t)
+static void main_apply_grid_cb(lv_timer_t *t)
 {
     lv_obj_t *wrap = find_tiles_wrap_anywhere();
     if (wrap)
     {
         remove_scrollbars(wrap);
-        apply_tiles_grid(wrap);
+        main_apply_tiles_grid(wrap);
         lv_timer_del(t); /* done */
     }
-}
-
-void ui_envhub_init(void)
-{
-    // lv_xml_register_font(NULL, "plex_sans_12", plex_sans_12);
-    ui_envhub_init_gen(NULL);
-
-    lv_obj_t *screen = screen_main_create();
-    lv_screen_load(screen);
-
-    bind_labels(screen);
-
-    if (time_panel)
-    {
-        lv_obj_add_flag(time_panel, LV_OBJ_FLAG_CLICKABLE);
-        lv_obj_add_event_cb(time_panel, top_panel_event_cb, LV_EVENT_CLICKED, NULL);
-    }
-
-    if (battery_panel)
-    {
-        lv_obj_add_flag(battery_panel, LV_OBJ_FLAG_CLICKABLE);
-        lv_obj_add_event_cb(battery_panel, top_panel_event_cb, LV_EVENT_CLICKED, NULL);
-    }
-
-    ui_envhub_set_time_text(NULL);
-    lv_timer_create(time_update_cb, 60000, NULL);
-
-    /* Layout fixup */
-    lv_timer_create(apply_grid_cb, 1, NULL);
-}
-
-static void bind_labels(lv_obj_t *screen)
-{
-    if (!screen)
-        return;
-
-    time_label = find_by_name_dfs(screen, "time");
-
-    status_bar = find_by_name_dfs(screen, "status_bar");
-    status_label = find_by_name_dfs(screen, "status_label");
-
-    battery_capacity_label = find_by_name_dfs(screen, "battery_capacity");
-    co2_label = find_by_name_dfs(screen, "co2_value");
-    temp_label = find_by_name_dfs(screen, "temp_value");
-    humidity_label = find_by_name_dfs(screen, "humidity_value");
-    pressure_label = find_by_name_dfs(screen, "pressure_value");
-    eco2_label = find_by_name_dfs(screen, "eco2_value");
-    tvoc_label = find_by_name_dfs(screen, "tvoc_value");
-
-    time_panel = find_by_name_dfs(screen, "time_panel");
-    battery_panel = find_by_name_dfs(screen, "battery_panel");
-
-    // power_label    = find_by_name_dfs(screen, "power_value");
-    // current_label  = find_by_name_dfs(screen, "current_value");
-    // voltage_label  = find_by_name_dfs(screen, "voltage_value");
 }
 
 static void time_update_cb(lv_timer_t *t)
@@ -367,18 +372,34 @@ void ui_envhub_set_status_summary(ui_status_severity_t severity, const char *tex
     }
 }
 
-#include <syslog.h>
-static void top_panel_event_cb(lv_event_t *e)
+static void main_top_panel_event_cb(lv_event_t *e)
 {
-    if (lv_event_get_code(e) != LV_EVENT_CLICKED)
+    if (lv_event_get_code(e) == LV_EVENT_CLICKED)
     {
-        return;
+        ui_envhub_show_secondary_screen();
     }
+}
 
-    lv_obj_t *screen2 = screen_secondary_create();
-    if (screen2)
+static void secondary_back_event_cb(lv_event_t *e)
+{
+    if (lv_event_get_code(e) == LV_EVENT_CLICKED)
     {
-        syslog(LOG_DEBUG, "Switching to secondary screen");
-        lv_screen_load(screen2);
+        ui_envhub_show_main_screen();
+    }
+}
+
+static void ui_envhub_show_main_screen(void)
+{
+    if (main_screen)
+    {
+        lv_screen_load(main_screen);
+    }
+}
+
+static void ui_envhub_show_secondary_screen(void)
+{
+    if (secondary_screen)
+    {
+        lv_screen_load(secondary_screen);
     }
 }
